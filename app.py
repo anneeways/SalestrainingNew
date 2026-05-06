@@ -696,8 +696,8 @@ def step3():
 
         col_skip, _ = st.columns([1, 5])
         with col_skip:
-            if st.button("Überspringen →"):
-                st.session_state.step = 4
+            if st.button("Zur Checkliste →"):
+                st.session_state.path = "fast"
                 st.rerun()
 
     else:
