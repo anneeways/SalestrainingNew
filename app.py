@@ -1142,16 +1142,20 @@ def step6():
              "Das sind Marktdaten, kein Anbieter-Pitch."),
         ]
         for arg_icon, title, text in args:
-            st.markdown(f"""
-            <div class="arg-item">
-                <div class="arg-icon-wrap">
-                    
-                </div>
-                <div>
-                    <strong style="color:#1E2A5E;">{title}</strong><br>
-                    <span style="color:#6B7280; font-size:0.87rem;">{text}</span>
-                </div>
-            </div>""", unsafe_allow_html=True)
+            col_i, col_t = st.columns([0.06, 0.94])
+            with col_i:
+                st.markdown(
+                    f"<div style='width:28px;height:28px;border-radius:50%;"
+                    f"background:#EEF0F8;display:flex;align-items:center;"
+                    f"justify-content:center;margin-top:3px;'>"
+                    f"<i class='fa-solid {arg_icon}' style='font-size:0.65rem;color:#1E2A5E;'></i>"
+                    f"</div>",
+                    unsafe_allow_html=True
+                )
+            with col_t:
+                st.markdown(f"**{title}**")
+                st.caption(text)
+            st.divider()
 
     with col2:
         st.markdown("**⚙️&nbsp; Szenarien im Vergleich**",
@@ -1169,18 +1173,21 @@ def step6():
             ("fa-circle", "badge-opt",  "OPTIMISTISCH", "+25% über Ziel",
              fmt(r["am"] * 1.25), f"{((r['am']*1.25 - r['total'])/r['total']*100):.0f}%"),
         ]
+        badge_colors = {"badge-cons": "#3B82F6", "badge-real": "#059669", "badge-opt": "#D97706"}
         for sc_icon, badge, label, sublabel, jahresgewinn, roi_v in scenarios:
-            st.markdown(f"""
-            <div class="scenario-tile">
-                <div class="s-badge {badge}">
-                     {label}
-                    <span style="color:#9CA3AF; font-weight:400;">&nbsp;— {sublabel}</span>
-                </div>
-                <div style="font-size:0.87rem; color:#6B7280;">
-                    Jahresgewinn: <strong style="color:#1E2A5E;">{jahresgewinn}</strong>
-                    &nbsp;·&nbsp; ROI: <strong style="color:#1E2A5E;">{roi_v}</strong>
-                </div>
-            </div>""", unsafe_allow_html=True)
+            color = badge_colors.get(badge, "#1E2A5E")
+            st.markdown(
+                f"<div style='background:white;border-radius:10px;border:1px solid #EAE7DF;"
+                f"padding:0.9rem 1.1rem;margin-bottom:0.5rem;'>"
+                f"<div style='font-size:0.7rem;font-weight:700;letter-spacing:0.06em;"
+                f"color:{color};text-transform:uppercase;margin-bottom:0.3rem;'>"
+                f"{label} <span style='color:#9CA3AF;font-weight:400;text-transform:none;'>— {sublabel}</span></div>"
+                f"<div style='font-size:0.87rem;color:#6B7280;'>"
+                f"Jahresgewinn: <strong style='color:#1E2A5E;'>{jahresgewinn}</strong>"
+                f" &nbsp;·&nbsp; ROI: <strong style='color:#1E2A5E;'>{roi_v}</strong></div>"
+                f"</div>",
+                unsafe_allow_html=True
+            )
 
         st.markdown("<br>", unsafe_allow_html=True)
         st.markdown("**🔍&nbsp; Die Kalkulation**",
