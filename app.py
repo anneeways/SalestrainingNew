@@ -263,13 +263,33 @@ html, body, [class*="css"] { font-family: 'Segoe UI', system-ui, -apple-system, 
 /* ── Buttons ── */
 .stButton > button {
     background: #1E2A5E !important; color: #F5F0E6 !important;
-    border: none !important; border-radius: 8px !important;
-    padding: 0.55rem 1.4rem !important;
+    border: 1.5px solid #1E2A5E !important; border-radius: 8px !important;
+    padding: 0.45rem 0.6rem !important;
     font-family: 'Segoe UI', system-ui, sans-serif !important;
-    font-weight: 500 !important; font-size: 0.9rem !important;
-    transition: opacity 0.2s !important;
+    font-weight: 500 !important; font-size: 0.82rem !important;
+    transition: all 0.15s !important;
+    white-space: nowrap !important;
 }
 .stButton > button:hover { opacity: 0.82 !important; }
+
+/* Hide invisible nav trigger buttons */
+[data-testid="stButton"] button:empty,
+[data-testid="stButton"] button[kind="secondary"]:not([data-nav-visible]) {
+    display: none !important;
+}
+/* Nav buttons — zero height hidden triggers */
+.nav-btn-hide > div > button {
+    position: absolute !important;
+    opacity: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    top: 0 !important; left: 0 !important;
+    cursor: pointer !important;
+    z-index: 10 !important;
+}
+.nav-btn-wrap {
+    position: relative;
+}
 
 hr { border: none; border-top: 1px solid #EAE7DF; margin: 1.6rem 0; }
 label { color: #1E2A5E !important; font-weight: 500; }
@@ -387,86 +407,42 @@ def render_progress(current):
         Schritt {current} von {len(STEP_META)} — {label_text}
     </div>""", unsafe_allow_html=True)
 
-    cols = st.columns(len(STEP_META) * 2 - 1)
-    for i, (icon, label) in enumerate(STEP_META, 1):
-        col_idx = (i - 1) * 2
-        if i < current:
-            bg, color = "#B8BCDE", "#1E2A5E"
-        elif i == current:
-            bg, color = "#1E2A5E", "#F5F0E6"
-        else:
-            bg, color = "#E5E1D8", "#C4C0B8"
-
-        shadow = "box-shadow:0 0 0 3px rgba(30,42,94,0.18);" if i == current else ""
-        label_color = "#1E2A5E" if i <= current else "#C4C0B8"
-        label_weight = "600" if i == current else "400"
-
-        with cols[col_idx]:
-            st.markdown(f"""
-            <div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
-                <div style="width:32px;height:32px;border-radius:50%;
-                            background:{bg};color:{color};{shadow}
-                            display:flex;align-items:center;justify-content:center;
-                            font-size:0.75rem;margin:0 auto;">
-                    <i class="fa-solid {icon}"></i>
-                </div>
-                <div style="font-size:0.62rem;color:{label_color};text-align:center;
-                            font-weight:{label_weight};white-space:nowrap;">{label}</div>
-            </div>""", unsafe_allow_html=True)
-
-        if i < len(STEP_META):
-            line_color = "#B8BCDE" if i < current else "#E5E1D8"
-            with cols[col_idx + 1]:
-                st.markdown(f"""
-                <div style="height:32px;display:flex;align-items:center;padding:0 2px;">
-                    <div style="height:2px;width:100%;background:{line_color};border-radius:1px;"></div>
-                </div>""", unsafe_allow_html=True)
-
-    st.markdown("<div style='margin-bottom:1.8rem;'></div>", unsafe_allow_html=True)
+    st.markdown("<div style='margin-bottom:0.2rem;'></div>", unsafe_allow_html=True)
 
 # ─── Navigation Bar ───────────────────────────────────────────────────────────
 def render_nav():
-    """Quick-jump navigation bar"""
+    """Quick-jump navigation — replaces progress stepper"""
     current = st.session_state.step
-
     nav_items = [
-        (1, "fa-comments",   "Gespräch"),
-        (2, "fa-code-branch","Dein Weg"),
-        (3, "fa-compass",    "Vorbereitung"),
-        (4, "fa-handshake",  "Follow-up"),
-        (5, "fa-calculator", "Kalkulator"),
-        (6, "fa-chart-line", "Ergebnis"),
+        (1, "fa-comments",    "Gespräch"),
+        (2, "fa-code-branch", "Dein Weg"),
+        (3, "fa-compass",     "Vorbereitung"),
+        (4, "fa-handshake",   "Follow-up"),
+        (5, "fa-calculator",  "Kalkulator"),
+        (6, "fa-chart-line",  "Ergebnis"),
     ]
 
-    cols = st.columns([1.2] + [1]*6)
-    with cols[0]:
-        st.markdown("""
-        <div style="height:32px; display:flex; align-items:center;">
-            <span style="font-size:0.65rem; color:#9CA3AF; font-weight:700;
-                         letter-spacing:0.07em; text-transform:uppercase;">
-                Springen zu:
-            </span>
-        </div>""", unsafe_allow_html=True)
-
+    cols = st.columns(6)
     for i, (step_num, icon, label) in enumerate(nav_items):
-        with cols[i + 1]:
-            is_current = step_num == current
-            bg = "#1E2A5E" if is_current else "#E8E3D8"
-            color = "#F5F0E6" if is_current else "#6B7280"
-            border = "1.5px solid #1E2A5E" if not is_current else "none"
-            st.markdown(f"""
-            <div style="background:{bg}; color:{color}; border:{border};
-                        border-radius:8px; padding:0.35rem 0.5rem;
-                        text-align:center; font-size:0.7rem; font-weight:600;
-                        display:flex; align-items:center; justify-content:center;
-                        gap:0.3rem; cursor:pointer; line-height:1.2;">
-                <i class="fa-solid {icon}"></i> {label}
-            </div>""", unsafe_allow_html=True)
-            if st.button("", key=f"nav_{step_num}", help=f"Zu: {label}"):
+        is_current = step_num == current
+        is_done = step_num < current
+        bg     = "#1E2A5E" if is_current else ("#B8BCDE" if is_done else "white")
+        color  = "white"   if (is_current or is_done) else "#9CA3AF"
+        border = "1.5px solid #1E2A5E" if is_current else ("1.5px solid #B8BCDE" if is_done else "1.5px solid #D6D3C8")
+        weight = "700" if is_current else "500"
+
+        with cols[i]:
+            clicked = st.button(
+                f"  {label}",
+                key=f"nav_{step_num}",
+                help=f"Springe zu: {label}",
+                use_container_width=True
+            )
+            if clicked:
                 st.session_state.step = step_num
                 st.rerun()
 
-    st.markdown("<div style='margin-bottom:0.5rem;'></div>", unsafe_allow_html=True)
+    st.markdown("<div style='margin-bottom:1.2rem;'></div>", unsafe_allow_html=True)
 
 
 
