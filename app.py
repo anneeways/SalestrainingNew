@@ -24,13 +24,11 @@ st.set_page_config(
 )
 
 # ─── Font Awesome ─────────────────────────────────────────────────────────────
-# ─── Load Font Awesome via multiple fallback methods ─────────────────────────
+# ─── Font Awesome — single lightweight CDN ───────────────────────────────────
 st.markdown("""
-<style>
-@import url('https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css');
-</style>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+  crossorigin="anonymous"/>
 """, unsafe_allow_html=True)
 
 # ─── CSS ─────────────────────────────────────────────────────────────────────
@@ -40,6 +38,28 @@ st.markdown("""
 
 html, body, [class*="css"] { font-family: 'Segoe UI', system-ui, sans-serif; }
 .stApp { background-color: #E8E3D8; }
+
+/* ── Mobile ── */
+@media (max-width: 768px) {
+    /* Hide progress stepper dots on mobile — nav buttons are enough */
+    .progress-mobile-hide { display: none !important; }
+
+    /* Compact nav buttons */
+    .stButton > button {
+        font-size: 0.72rem !important;
+        padding: 0.35rem 0.3rem !important;
+    }
+    /* Smaller hero header */
+    .main-hero { padding: 0.9rem 1rem !important; }
+    .main-hero .hero-title { font-size: 1.3rem !important; }
+    .main-hero .hero-creds { display: none !important; }
+
+    /* Full-width dialogue boxes */
+    .dialogue-box { padding: 0.8rem 0.9rem !important; }
+
+    /* Stack columns on mobile */
+    .scene-header { font-size: 1.4rem !important; }
+}
 
 /* ── Content Boxes ── */
 .content-box {
@@ -476,7 +496,8 @@ def render_progress(current):
     # Progress bar
     st.progress(current / n)
 
-    # Step dots — one column per step
+    # Step dots — hidden on mobile, visible on desktop
+    st.markdown("<div class='progress-mobile-hide'>", unsafe_allow_html=True)
     cols = st.columns(n)
     for i, (_, name) in enumerate(STEP_META, 1):
         step_icon_name = STEP_ICONS[i-1]
@@ -504,7 +525,8 @@ def render_progress(current):
                 f"</div>",
                 unsafe_allow_html=True
             )
-    st.markdown("<div style='margin-bottom:1.5rem;'></div>", unsafe_allow_html=True)
+    st.markdown("</div>", unsafe_allow_html=True)
+    st.markdown("<div style='margin-bottom:0.8rem;'></div>", unsafe_allow_html=True)
 # ─── Speaker Helper ───────────────────────────────────────────────────────────
 def dialogue(speaker, text, kind="joey"):
     """kind: joey | vl | thought"""
@@ -589,12 +611,12 @@ def render_nav():
         ("fa-award",  "Ergebnis"),
     ]
     # Navigation buttons
-    cols = st.columns(6)
+    cols = st.columns(7)  # 7 steps
     for i, (col, (fa, label)) in enumerate(zip(cols, nav_meta), 1):
         with col:
             is_cur = (i == st.session_state.get("step", 1))
             if st.button(
-                f"{label}",
+                label,
                 key=f"nav_jump_{i}",
                 use_container_width=True,
                 type="primary" if is_cur else "secondary"
