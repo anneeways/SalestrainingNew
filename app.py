@@ -735,46 +735,105 @@ def step3():
             ✅ &nbsp;Was Joey klären muss — bevor sie rechnet
         </div>""", unsafe_allow_html=True)
 
-        items = [
+        # Part A: Can answer now
+        items_now = [
             ("fa-lightbulb", "Ist Training wirklich die richtige Antwort?",
-             "Haben wir Führungsprobleme im Team? Sind Prozesse unklar? Fehlt Motivation — oder echtes Skill-Gap? Training löst nur das letzte."),
-            ("fa-people-group", "Führung & Teamdynamik prüfen",
-             "Wie führt Thomas sein Team? Gibt es Fluktuation, Demotivation oder fehlende Klarheit über Erwartungen — Symptome die kein Training behebt."),
+             "Haben wir Führungsprobleme? Unklare Prozesse? Fehlt Motivation — oder echtes Skill-Gap? Training löst nur das letzte."),
+            ("fa-people-group", "Führung & Teamdynamik",
+             "Wie führt Thomas sein Team? Gibt es Fluktuation, Demotivation, fehlende Erwartungsklarheit?"),
             ("fa-magnifying-glass", "Was ist das eigentliche Problem?",
-             "Warum stagniert die Abschlussquote bei 15%? Fähigkeitslücke, Prozess, Markt — oder alles zusammen?"),
+             "Fähigkeitslücke, Prozess, Markt — oder alles zusammen? Eigene Einschätzung vor dem Gespräch."),
             ("fa-chart-line", "Marktdruck & Wettbewerb",
-             "Was macht die Konkurrenz anders? Hat der Wettbewerb bessere Abschlussquoten — und wenn ja, warum?"),
+             "Was macht die Konkurrenz anders? Hat der Wettbewerb bessere Abschlussquoten?"),
             ("fa-circle-question", "Warum jetzt?",
-             "Warum ist dieser Moment der richtige — und nicht in 6 Monaten? Was verschärft die Dringlichkeit?"),
-            ("fa-triangle-exclamation", "Was passiert bei Nicht-Investition?",
-             "Entgangener Gewinn jeden Monat — der Status quo ist nicht kostenlos."),
-            ("fa-table-list", "Welche Zahlen brauche ich?",
-             "Leads/Monat, Deal-Wert, Marge pro Abschluss, Teilnehmerzahl, Ausfallkosten."),
-            ("fa-shield-halved", "Warum glaube ich, dass das Training wirkt?",
-             "Anbieter-Referenzen, vergleichbare Unternehmen — kein Versprechen, Daten."),
-            ("fa-comments-dollar", "Welche Einwände wird der CFO haben?",
-             "'Woher wissen wir, dass die Quote wirklich steigt?' — Antwort vorbereiten."),
-            ("fa-coins", "Gewinn statt Umsatz kommunizieren",
-             "Nicht Mehrumsatz, sondern zusätzlicher Deckungsbeitrag ist das Argument."),
-            ("fa-down-left-and-up-right-to-center", "Konservatives Szenario vorbereiten",
-             "Was wenn's nur 20% statt 25% werden? Ist der Business Case noch positiv?"),
+             "Was verschärft die Dringlichkeit? Wettbewerbsdruck, Quartalsziele, Personalwechsel?"),
+            ("fa-coins", "Gewinn statt Umsatz — meine Argumentation",
+             "Nicht Mehrumsatz, sondern zusätzlicher Deckungsbeitrag ist das CFO-Argument."),
         ]
 
-        for item_icon, title, detail in items:
-            with st.container():
-                col_icon, col_text = st.columns([0.08, 0.92])
-                with col_icon:
+        # Part B: Need to find out from Thomas
+        items_thomas = [
+            ("fa-table-list", "Zahlen die ich brauche",
+             "Leads/Monat, Deal-Wert, Marge, Teilnehmerzahl, Ausfallkosten — alles für den Kalkulator."),
+            ("fa-shield-halved", "Warum wirkt das Training?",
+             "Referenzkunden, vergleichbare Unternehmen — kein Anbieter-Versprechen, sondern Daten."),
+            ("fa-users", "Pilot möglich? Top-Performer zuerst?",
+             "Könnten wir mit 2-3 Top-Performern starten und ein Train-the-Trainer Konzept entwickeln?"),
+            ("fa-comments-dollar", "CFO-Einwände antizipieren",
+             "Welche Gegenargumente kommen? Antworten vorbereiten bevor das Meeting stattfindet."),
+            ("fa-triangle-exclamation", "Was passiert wenn wir nichts tun?",
+             "Entgangener Gewinn pro Monat — den konkreten Preis des Abwartens benennen."),
+        ]
+
+        def render_checklist_section(section_items, section_key_prefix):
+            col_h1, col_h2 = st.columns(2, gap="medium")
+            with col_h1:
+                st.markdown(
+                    "<div style='background:#1E2A5E;color:#B8BCDE;border-radius:8px;"
+                    "padding:0.5rem 1rem;font-size:0.75rem;font-weight:700;"
+                    "letter-spacing:0.06em;text-transform:uppercase;'>Frage / Überlegung</div>",
+                    unsafe_allow_html=True
+                )
+            with col_h2:
+                st.markdown(
+                    "<div style='background:#1E2A5E;color:#B8BCDE;border-radius:8px;"
+                    "padding:0.5rem 1rem;font-size:0.75rem;font-weight:700;"
+                    "letter-spacing:0.06em;text-transform:uppercase;'>✏️ Deine Erkenntnis</div>",
+                    unsafe_allow_html=True
+                )
+            st.markdown("<div style='height:6px'></div>", unsafe_allow_html=True)
+            for item_icon, title, detail in section_items:
+                note_key = f"{section_key_prefix}_{title[:20].replace(' ','_')}"
+                col_q, col_a = st.columns(2, gap="medium")
+                with col_q:
                     st.markdown(
-                        f"<div style='width:28px;height:28px;border-radius:50%;"
-                        f"background:#D1FAE5;display:flex;align-items:center;"
-                        f"justify-content:center;margin-top:2px;'>"
-                        f"<i class='fa-solid {item_icon}' style='font-size:0.69rem;color:#059669;'></i>"
-                        f"</div>",
+                        f"<div style='background:white;border-radius:10px;"
+                        f"border:1.5px solid #D1CCBF;padding:0.85rem 1rem;"
+                        f"box-shadow:0 1px 4px rgba(0,0,0,0.05);'>"
+                        f"<div style='display:flex;align-items:center;gap:0.6rem;margin-bottom:0.3rem;'>"
+                        f"<div style='width:26px;height:26px;min-width:26px;border-radius:50%;"
+                        f"background:#D1FAE5;display:flex;align-items:center;justify-content:center;'>"
+                        f"<i class='fa-solid {item_icon}' style='font-size:0.65rem;color:#059669;'></i>"
+                        f"</div>"
+                        f"<span style='font-size:0.9rem;font-weight:700;color:#1E2A5E;'>{title}</span>"
+                        f"</div>"
+                        f"<div style='font-size:0.81rem;color:#9CA3AF;line-height:1.5;"
+                        f"padding-left:32px;'>{detail}</div></div>",
                         unsafe_allow_html=True
                     )
-                with col_text:
-                    st.markdown(f"**{title}**")
-                    st.caption(detail)
+                with col_a:
+                    val = st.text_area(
+                        label=title, key=note_key,
+                        placeholder="Was ist deine Einschätzung?",
+                        height=95, label_visibility="collapsed"
+                    )
+                    st.session_state.prep_notes[title] = val
+                st.markdown("<div style='height:6px'></div>", unsafe_allow_html=True)
+
+        # Section A
+        st.markdown(
+            "<div style='background:#1E2A5E;border-radius:10px;padding:0.6rem 1rem;"
+            "margin-bottom:0.7rem;'><span style='color:#F5F0E6;font-weight:700;"
+            "font-size:0.88rem;'>💡 Das kann ich jetzt schon beantworten</span>"
+            "<span style='color:#B8BCDE;font-size:0.8rem;'> — vor dem Gespräch mit Thomas</span></div>",
+            unsafe_allow_html=True
+        )
+        render_checklist_section(items_now, "now")
+
+        st.markdown("<div style='height:1rem'></div>", unsafe_allow_html=True)
+
+        # Section B
+        st.markdown(
+            "<div style='background:#B8BCDE;border-radius:10px;padding:0.6rem 1rem;"
+            "margin-bottom:0.7rem;'><span style='color:#1E2A5E;font-weight:700;"
+            "font-size:0.88rem;'>🤝 Das muss ich noch herausfinden</span>"
+            "<span style='color:#1E2A5E;font-size:0.8rem;opacity:0.7;'> — im Follow-up mit Thomas</span></div>",
+            unsafe_allow_html=True
+        )
+        render_checklist_section(items_thomas, "thomas")
+
+        for item_icon, title, detail in []:  # dummy to keep indent
+            pass  # handled by render_checklist_section
 
         st.markdown("<br>", unsafe_allow_html=True)
         if st.button("Weiter zum Follow-up-Gespräch  →"):
@@ -847,9 +906,51 @@ def step5():
     st.markdown('<div class="scene-header">Der Kalkulator</div>', unsafe_allow_html=True)
     st.markdown("""
     <div class="scene-sub">
-        🧮
-        Joey rechnet — mit den Zahlen aus dem Gespräch
+        🧮 Joey rechnet — mit den Zahlen aus dem Gespräch
     </div>""", unsafe_allow_html=True)
+
+    # Data summary before calculator
+    notes = {k: v for k, v in st.session_state.get("prep_notes", {}).items() if v and v.strip()}
+    if notes:
+        with st.expander("📋 Gesammelte Erkenntnisse — alle Daten auf einen Blick", expanded=False):
+            st.markdown(
+                "<div style='background:#1E2A5E;border-radius:8px;padding:0.6rem 1rem;"
+                "margin-bottom:0.8rem;color:#B8BCDE;font-size:0.78rem;font-weight:700;"
+                "letter-spacing:0.06em;text-transform:uppercase;'>"
+                "Aus Checkliste + Follow-up-Gespräch</div>",
+                unsafe_allow_html=True
+            )
+            for q, a in notes.items():
+                col_q, col_a = st.columns([1, 1], gap="medium")
+                with col_q:
+                    st.markdown(
+                        f"<div style='background:#EEF0F8;border-radius:8px;"
+                        f"padding:0.5rem 0.8rem;font-size:0.84rem;"
+                        f"font-weight:600;color:#1E2A5E;'>{q}</div>",
+                        unsafe_allow_html=True
+                    )
+                with col_a:
+                    st.markdown(
+                        f"<div style='background:white;border-radius:8px;"
+                        f"border:1px solid #E5E1D8;padding:0.5rem 0.8rem;"
+                        f"font-size:0.84rem;color:#374151;'>{a}</div>",
+                        unsafe_allow_html=True
+                    )
+                st.markdown("<div style='height:3px'></div>", unsafe_allow_html=True)
+
+            # Pilot scenario notice
+            st.markdown(
+                "<div style='background:#D1FAE5;border-radius:8px;border-left:3px solid #059669;"
+                "padding:0.8rem 1rem;margin-top:0.8rem;font-size:0.85rem;color:#065F46;'>"
+                "<strong>💡 Zwei Szenarien verfügbar:</strong> Volltraining (10 Personen) "
+                "oder Pilot mit Top-Performern (2-3 Personen) als Train-the-Trainer Ansatz. "
+                "Beide Optionen unten im Kalkulator vergleichen.</div>",
+                unsafe_allow_html=True
+            )
+    else:
+        st.info("💡 Tipp: Fülle die Checkliste in Schritt 3 aus — dann siehst du hier alle gesammelten Erkenntnisse.")
+
+    st.markdown("<hr>", unsafe_allow_html=True)
 
     st.markdown("""
     <div style="background:#F3F2EE;border-radius:10px;border-left:3px solid #B8BCDE;
@@ -1163,6 +1264,45 @@ def step6():
                 Prüfe Annahmen zur Marge und Conversion.
             </div>
         </div>""", unsafe_allow_html=True)
+
+    # Show checklist reflections
+    notes = {k: v for k, v in st.session_state.get("prep_notes", {}).items() if v and v.strip()}
+    if notes:
+        with st.expander("📋 Deine Erkenntnisse — Grundlage des Business Case", expanded=True):
+            for q, a in notes.items():
+                col_q, col_a = st.columns([1, 1], gap="medium")
+                with col_q:
+                    st.markdown(
+                        f"<div style='background:#EEF0F8;border-radius:8px;"
+                        f"padding:0.6rem 0.85rem;font-size:0.85rem;"
+                        f"font-weight:600;color:#1E2A5E;'>{q}</div>",
+                        unsafe_allow_html=True
+                    )
+                with col_a:
+                    st.markdown(
+                        f"<div style='background:white;border-radius:8px;"
+                        f"border:1.5px solid #D1CCBF;padding:0.6rem 0.85rem;"
+                        f"font-size:0.85rem;color:#374151;'>{a}</div>",
+                        unsafe_allow_html=True
+                    )
+                st.markdown("<div style='height:3px'></div>", unsafe_allow_html=True)
+    else:
+        st.info("💡 Fülle die Checkliste in Schritt 3 aus — deine Erkenntnisse erscheinen dann hier im Business Case.")
+
+    st.markdown("""
+    <div style='background:#FEF3C7;border-left:4px solid #D97706;border-radius:10px;
+                padding:1rem 1.4rem;margin:0.8rem 0;'>
+        <div style='font-weight:700;color:#92400E;margin-bottom:0.4rem;'>
+            ⚠️ Noch offen — parallel klären
+        </div>
+        <div style='font-size:0.88rem;color:#92400E;line-height:1.7;'>
+            Thomas hat zwei Teammitglieder die ihre Ziele dauerhaft verfehlen.
+            Führungsstrukturen und Feedback-Routinen könnten gestärkt werden.
+            <strong>Empfehlung:</strong> Training genehmigen — aber gleichzeitig
+            ein Führungsgespräch mit Thomas ansetzen und Teamzusammensetzung prüfen.
+            Das Training ist notwendig, aber nicht hinreichend.
+        </div>
+    </div>""", unsafe_allow_html=True)
 
     st.markdown("<hr>", unsafe_allow_html=True)
     col1, col2 = st.columns(2, gap="large")
