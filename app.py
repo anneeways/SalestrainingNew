@@ -36,6 +36,18 @@ st.markdown("""
 <style>
 /* Segoe UI — system font */
 
+/* ══ GLOBAL BUTTON OVERRIDE ══ */
+button, .stButton > button, [data-testid="stBaseButton-secondary"],
+[data-testid="stBaseButton-primary"], [data-baseweb="button"] {
+    background-color: #1E2A5E !important;
+    color: #ffffff !important;
+    border: none !important;
+    border-radius: 8px !important;
+    font-weight: 600 !important;
+    box-shadow: 0 2px 8px rgba(30,42,94,0.2) !important;
+}
+button:hover { opacity: 0.88 !important; background-color: #253472 !important; }
+
 html, body, [class*="css"] { font-family: 'Segoe UI', system-ui, sans-serif; }
 .stApp { background-color: #E8E3D8; }
 
