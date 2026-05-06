@@ -531,6 +531,30 @@ def render_nav():
     st.markdown("<div style='margin-bottom:0.5rem;'></div>", unsafe_allow_html=True)
 
 
+# ─── Dialogue Helper ──────────────────────────────────────────────────────────
+def dialogue(speaker, text, kind="joey"):
+    """kind: joey | vl | thought"""
+    fa_map  = {"joey": "fa-user", "vl": "fa-briefcase", "thought": "fa-ellipsis"}
+    av_cls  = {"joey": "av-joey", "vl": "av-vl",        "thought": "av-thought"}
+    sn_cls  = {"joey": "sn-joey", "vl": "sn-vl",        "thought": "sn-thought"}
+    fg_col  = {"joey": "#F5F0E6", "vl": "#6B7280",       "thought": "#9CA3AF"}
+    txt_cls = "dialogue-thought" if kind == "thought" else "dialogue-text"
+    fa  = fa_map.get(kind, "fa-user")
+    av  = av_cls.get(kind, "av-joey")
+    sn  = sn_cls.get(kind, "sn-joey")
+    fg  = fg_col.get(kind, "#F5F0E6")
+    return f"""
+    <div class="dialogue-box">
+        <div class="speaker-row">
+            <div class="speaker-avatar {av}" style="font-size:0.75rem;">
+                <i class="fa-solid {fa}" style="color:{fg};"></i>
+            </div>
+            <div class="speaker-name {sn}">{speaker}</div>
+        </div>
+        <div class="{txt_cls}">„{text}"</div>
+    </div>"""
+
+
 def step1():
     render_progress(1)
     render_nav()
