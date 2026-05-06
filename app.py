@@ -26,9 +26,9 @@ st.set_page_config(
 # ─── CSS ─────────────────────────────────────────────────────────────────────
 st.markdown("""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap');
+/* Segoe UI — system font */
 
-html, body, [class*="css"] { font-family: 'DM Sans', sans-serif; }
+html, body, [class*="css"] { font-family: 'Segoe UI', system-ui, sans-serif; }
 .stApp { background-color: #F5F0E6; }
 
 /* ── Progress ── */
@@ -61,7 +61,7 @@ html, body, [class*="css"] { font-family: 'DM Sans', sans-serif; }
 
 /* ── Typography ── */
 .scene-header {
-    font-family: 'DM Serif Display', serif;
+    font-family: 'Segoe UI', system-ui, sans-serif;
     color: #1E2A5E; font-size: 1.9rem; margin-bottom: 0.25rem;
 }
 .scene-sub {
@@ -101,7 +101,7 @@ html, body, [class*="css"] { font-family: 'DM Sans', sans-serif; }
 
 /* ── Choice Cards ── */
 .choice-title {
-    font-family: 'DM Serif Display', serif;
+    font-family: 'Segoe UI', system-ui, sans-serif;
     color: #1E2A5E; font-size: 1.25rem; margin: 1.2rem 0 1.1rem;
 }
 .choice-card-navy {
@@ -120,11 +120,11 @@ html, body, [class*="css"] { font-family: 'DM Sans', sans-serif; }
 .ci-navy  { background: rgba(184,188,222,0.25); color: #B8BCDE; }
 .ci-light { background: #F5F0E6; color: #1E2A5E; }
 .choice-card-navy h3  {
-    font-family: 'DM Serif Display', serif; font-size: 1.15rem;
+    font-family: 'Segoe UI', system-ui, sans-serif; font-size: 1.15rem;
     color: #F5F0E6; margin-bottom: 0.5rem;
 }
 .choice-card-light h3 {
-    font-family: 'DM Serif Display', serif; font-size: 1.15rem;
+    font-family: 'Segoe UI', system-ui, sans-serif; font-size: 1.15rem;
     color: #1E2A5E; margin-bottom: 0.5rem;
 }
 .choice-card-navy p  { font-size: 0.87rem; color: #B8BCDE; line-height: 1.7; }
@@ -183,7 +183,7 @@ html, body, [class*="css"] { font-family: 'DM Sans', sans-serif; }
     letter-spacing: 0.08em; color: #B8BCDE; margin-bottom: 0.25rem;
 }
 .kpi-value {
-    font-family: 'DM Serif Display', serif;
+    font-family: 'Segoe UI', system-ui, sans-serif;
     font-size: 1.55rem; color: #F5F0E6; line-height: 1;
 }
 .kpi-sub { font-size: 0.68rem; color: #B8BCDE; margin-top: 0.2rem; }
@@ -361,33 +361,91 @@ STEP_META = [
     ("📊", "Ergebnis"),
 ]
 
+# ─── Inline SVG Icons (no CDN needed) ────────────────────────────────────────
+def icon(name, size=18, color="currentColor"):
+    """Return inline SVG for given icon name"""
+    paths = {
+        "chat":       "M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z",
+        "fork":       "M7 3a2 2 0 100 4 2 2 0 000-4zm10 0a2 2 0 100 4 2 2 0 000-4zM12 17a2 2 0 100 4 2 2 0 000-4zM7 7v2a2 2 0 002 2h6a2 2 0 002-2V7M12 11v6",
+        "compass":    "M16.24 7.76l-1.804 5.411-5.41 1.804 1.804-5.411 5.41-1.804zM12 2a10 10 0 100 20A10 10 0 0012 2z",
+        "handshake":  "M9 12l-4-4m0 0l4-4M5 8h7a4 4 0 014 4v1M15 17l4 4m0 0l-4 4m4-4H8a4 4 0 01-4-4v-1",
+        "calculator": "M9 7H7v2h2V7zm0 4H7v2h2v-2zm0 4H7v2h2v-2zm4-8h-2v2h2V7zm0 4h-2v2h2v-2zm0 4h-2v6h2v-6zm4-8h-2v8h2V7zM5 3a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V5a2 2 0 00-2-2H5z",
+        "chart":      "M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z",
+        "user":       "M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2M12 11a4 4 0 100-8 4 4 0 000 8z",
+        "briefcase":  "M20 7H4a2 2 0 00-2 2v10a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2zM16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2",
+        "thought":    "M8 12h.01M12 12h.01M16 12h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z",
+        "clock":      "M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z",
+        "location":   "M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z M15 11a3 3 0 11-6 0 3 3 0 016 0z",
+        "robot":      "M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17H3a2 2 0 01-2-2V5a2 2 0 012-2h3M15 3h3a2 2 0 012 2v10a2 2 0 01-2 2h-2M12 12h.01M8 8h.01M16 8h.01",
+        "pen":        "M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z",
+        "check":      "M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z",
+        "trending":   "M13 7h8m0 0v8m0-8l-8 8-4-4-6 6",
+        "money":      "M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z",
+        "fire":       "M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z M9.879 16.121A3 3 0 1012.015 11L11 14H9c0 .768.293 1.536.879 2.121z",
+        "shield":     "M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z",
+        "star":       "M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z",
+        "hourglass":  "M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z",
+        "download":   "M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4",
+        "refresh":    "M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15",
+    }
+    path = paths.get(name, paths["chat"])
+    return f'''<svg xmlns="http://www.w3.org/2000/svg" width="{size}" height="{size}" 
+         viewBox="0 0 24 24" fill="none" stroke="{color}" 
+         stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="{path}"/>
+    </svg>'''
+
+STEP_ICONS = ["chat","fork","compass","handshake","calculator","chart"]
+
+
+
 def render_progress(current):
-    step_names = [s[1] for s in STEP_META]
-    step_icons = [s[0] for s in STEP_META]
     n = len(STEP_META)
+    names = [s[1] for s in STEP_META]
 
     # Step label
-    st.markdown(f"**📍 Schritt {current} von {n} — {step_names[current-1]}**")
+    st.markdown(
+        f"<p style='font-size:0.72rem;color:#9CA3AF;letter-spacing:0.07em;"
+        f"text-transform:uppercase;font-weight:600;margin-bottom:0.5rem;'>"
+        f"{icon('location',14,'#9CA3AF')} &nbsp;Schritt {current} von {n} — {names[current-1]}</p>",
+        unsafe_allow_html=True
+    )
 
-    # Native progress bar
+    # Progress bar
     st.progress(current / n)
 
-    # Step dots using columns
+    # Step dots — one column per step
     cols = st.columns(n)
-    for i, (icon, name) in enumerate(STEP_META, 1):
+    for i, (_, name) in enumerate(STEP_META, 1):
+        step_icon_name = STEP_ICONS[i-1]
+        if i < current:
+            bg, fg, opacity, lcolor = "#B8BCDE", "#1E2A5E", "1", "#9CA3AF"
+        elif i == current:
+            bg, fg, opacity, lcolor = "#1E2A5E", "#F5F0E6", "1", "#1E2A5E"
+        else:
+            bg, fg, opacity, lcolor = "#E5E1D8", "#C4C0B8", "0.5", "#C4C0B8"
+
+        shadow = "box-shadow:0 0 0 3px rgba(30,42,94,0.15);" if i == current else ""
+        fw = "700" if i == current else "400"
+
         with cols[i-1]:
-            if i < current:
-                st.markdown(f"<div style='text-align:center;font-size:1.1rem;opacity:0.5;'>{icon}</div>", unsafe_allow_html=True)
-            elif i == current:
-                st.markdown(f"<div style='text-align:center;font-size:1.3rem;'>{icon}</div>", unsafe_allow_html=True)
-                st.markdown(f"<div style='text-align:center;font-size:0.6rem;font-weight:700;color:#1E2A5E;'>{name}</div>", unsafe_allow_html=True)
-            else:
-                st.markdown(f"<div style='text-align:center;font-size:1.1rem;opacity:0.25;'>{icon}</div>", unsafe_allow_html=True)
-    st.markdown("---")
+            st.markdown(
+                f"<div style='text-align:center;opacity:{opacity};'>"
+                f"<div style='width:32px;height:32px;border-radius:50%;"
+                f"background:{bg};{shadow}display:flex;align-items:center;"
+                f"justify-content:center;margin:0 auto 3px;'>"
+                f"{icon(step_icon_name, 14, fg)}"
+                f"</div>"
+                f"<div style='font-size:0.58rem;color:{lcolor};font-weight:{fw};"
+                f"white-space:nowrap;overflow:hidden;text-overflow:ellipsis;'>{name}</div>"
+                f"</div>",
+                unsafe_allow_html=True
+            )
+    st.markdown("<div style='margin-bottom:1.5rem;'></div>", unsafe_allow_html=True)
 # ─── Speaker Helper ───────────────────────────────────────────────────────────
 def dialogue(speaker, text, kind="joey"):
     """kind: joey | vl | thought"""
-    icons = {"joey": "J", "vl": "T", "thought": "···"}
+    icon_map = {"joey": "user", "vl": "briefcase", "thought": "thought"}
     av_cls = {"joey": "av-joey", "vl": "av-vl", "thought": "av-thought"}
     sn_cls = {"joey": "sn-joey", "vl": "sn-vl", "thought": "sn-thought"}
     txt_cls = "dialogue-thought" if kind == "thought" else "dialogue-text"
@@ -438,7 +496,7 @@ def make_charts(r):
     fig.update_layout(
         height=310, showlegend=False,
         plot_bgcolor=cream, paper_bgcolor=cream,
-        font=dict(family="DM Sans, sans-serif", color=navy),
+        font=dict(family="Segoe UI, system-ui, sans-serif", color=navy),
         margin=dict(t=45, b=10, l=10, r=10)
     )
     fig.update_xaxes(showgrid=False, linecolor="#EAE7DF")
