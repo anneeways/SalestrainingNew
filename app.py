@@ -493,23 +493,42 @@ def render_nav():
     """Simple text navigation — current step highlighted navy"""
     current = st.session_state.get("step", 1)
     labels = [s[1] for s in STEP_META]
+
+    # CSS to style nav buttons
+    st.markdown("""
+    <style>
+    div[data-testid="stHorizontalBlock"] button[kind="secondary"] {
+        background: transparent !important;
+        border: none !important;
+        border-bottom: 2px solid transparent !important;
+        border-radius: 0 !important;
+        color: #9CA3AF !important;
+        font-size: 0.78rem !important;
+        font-weight: 400 !important;
+        padding: 0.3rem 0.2rem !important;
+    }
+    div[data-testid="stHorizontalBlock"] button[kind="primary"] {
+        background: transparent !important;
+        border: none !important;
+        border-bottom: 3px solid #1E2A5E !important;
+        border-radius: 0 !important;
+        color: #1E2A5E !important;
+        font-size: 0.78rem !important;
+        font-weight: 700 !important;
+        padding: 0.3rem 0.2rem !important;
+    }
+    </style>""", unsafe_allow_html=True)
+
     cols = st.columns(len(labels))
     for i, (col, label) in enumerate(zip(cols, labels), 1):
         with col:
             is_cur = (i == current)
-            st.markdown(
-                f"<div style='text-align:center;padding:0.4rem 0.2rem;"
-                f"border-bottom:3px solid {'#1E2A5E' if is_cur else 'transparent'};"
-                f"font-size:0.78rem;font-weight:{'700' if is_cur else '400'};"
-                f"color:{'#1E2A5E' if is_cur else '#9CA3AF'};"
-                f"cursor:pointer;white-space:nowrap;'>{label}</div>",
-                unsafe_allow_html=True
-            )
-            if st.button(label, key=f"nav_{i}", use_container_width=True,
-                         label_visibility="collapsed"):
+            if st.button(label, key=f"nav_{i}",
+                         use_container_width=True,
+                         type="primary" if is_cur else "secondary"):
                 st.session_state.step = i
                 st.rerun()
-    st.markdown("<div style='margin-bottom:1rem;'></div>", unsafe_allow_html=True)
+    st.markdown("<div style='margin-bottom:0.5rem;'></div>", unsafe_allow_html=True)
 
 
 def step1():
