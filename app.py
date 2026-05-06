@@ -305,7 +305,7 @@ def init():
     for k, v in {
         "step": 1, "path": None, "max_steps": 7,
         "swifty_messages": [], "params": None, "results": None,
-        "prep_notes": {}, "status_quo": {}
+        "prep_notes": {}, "status_quo": {}, "recommendation": "Volltraining"
     }.items():
         if k not in st.session_state:
             st.session_state[k] = v
@@ -387,13 +387,13 @@ def swifty_call(messages):
 
 # ─── Progress Bar ─────────────────────────────────────────────────────────────
 STEP_META = [
-    ("fa-comments",       "Das Gespräch"),
-    ("fa-code-branch",    "Dein Weg"),
-    ("fa-compass",        "Vorbereitung"),
-    ("fa-handshake",      "Follow-up"),
-    ("fa-layer-group",    "Datensynthese"),
+    ("fa-comment-dots",       "Das Gespräch"),
+    ("fa-arrow-right-arrow-left",    "Dein Weg"),
+    ("fa-list-check",        "Vorbereitung"),
+    ("fa-people-arrows",      "Follow-up"),
+    ("fa-magnifying-glass-chart",    "Datensynthese"),
     ("fa-calculator",     "Kalkulator"),
-    ("fa-chart-line",     "Ergebnis"),
+    ("fa-award",     "Ergebnis"),
 ]
 
 
@@ -433,7 +433,7 @@ def svg_icon(name, size=18, color="currentColor"):
       <path d="{path}"/>
     </svg>'''
 
-STEP_ICONS = ["fa-comments","fa-code-branch","fa-compass","fa-handshake","fa-layer-group","fa-calculator","fa-chart-line"]
+STEP_ICONS = ["fa-comment-dots","fa-arrow-right-arrow-left","fa-list-check","fa-people-arrows","fa-magnifying-glass-chart","fa-calculator","fa-award"]
 
 
 
@@ -554,13 +554,13 @@ def render_nav():
     """Jump-to navigation between steps"""
     current = st.session_state.get("step", 1)
     nav_meta = [
-        ("fa-comments",    "Gespräch"),
-        ("fa-code-branch", "Dein Weg"),
-        ("fa-compass",     "Vorbereitung"),
-        ("fa-handshake",   "Follow-up"),
-        ("fa-layer-group", "Datensynthese"),
+        ("fa-comment-dots",    "Gespräch"),
+        ("fa-arrow-right-arrow-left", "Dein Weg"),
+        ("fa-list-check",     "Vorbereitung"),
+        ("fa-people-arrows",   "Follow-up"),
+        ("fa-magnifying-glass-chart", "Datensynthese"),
         ("fa-calculator",  "Kalkulator"),
-        ("fa-chart-line",  "Ergebnis"),
+        ("fa-award",  "Ergebnis"),
     ]
     # Navigation buttons
     cols = st.columns(6)
@@ -759,13 +759,13 @@ def step3():
 
         # Part A: Can answer now
         items_now = [
-            ("fa-lightbulb", "Ist Training wirklich die richtige Antwort?",
+            ("fa-circle-question", "Ist Training wirklich die richtige Antwort?",
              "Haben wir Führungsprobleme? Unklare Prozesse? Fehlt Motivation — oder echtes Skill-Gap? Training löst nur das letzte."),
-            ("fa-people-group", "Führung & Teamdynamik",
+            ("fa-users-gear", "Führung & Teamdynamik",
              "Wie führt Thomas sein Team? Gibt es Fluktuation, Demotivation, fehlende Erwartungsklarheit?"),
-            ("fa-magnifying-glass", "Was ist das eigentliche Problem?",
+            ("fa-magnifying-glass-chart", "Was ist das eigentliche Problem?",
              "Fähigkeitslücke, Prozess, Markt — oder alles zusammen? Eigene Einschätzung vor dem Gespräch."),
-            ("fa-chart-line", "Marktdruck & Wettbewerb",
+            ("fa-award", "Marktdruck & Wettbewerb",
              "Was macht die Konkurrenz anders? Hat der Wettbewerb bessere Abschlussquoten?"),
             ("fa-circle-question", "Warum jetzt?",
              "Was verschärft die Dringlichkeit? Wettbewerbsdruck, Quartalsziele, Personalwechsel?"),
@@ -775,15 +775,15 @@ def step3():
 
         # Part B: Need to find out from Thomas
         items_thomas = [
-            ("fa-table-list", "Zahlen die ich brauche",
+            ("fa-table-cells-large", "Zahlen die ich brauche",
              "Leads/Monat, Deal-Wert, Marge, Teilnehmerzahl, Ausfallkosten — alles für den Kalkulator."),
-            ("fa-shield-halved", "Warum wirkt das Training?",
+            ("fa-shield-check", "Warum wirkt das Training?",
              "Referenzkunden, vergleichbare Unternehmen — kein Anbieter-Versprechen, sondern Daten."),
-            ("fa-users", "Pilot möglich? Top-Performer zuerst?",
+            ("fa-user-group", "Pilot möglich? Top-Performer zuerst?",
              "Könnten wir mit 2-3 Top-Performern starten und ein Train-the-Trainer Konzept entwickeln?"),
-            ("fa-comments-dollar", "CFO-Einwände antizipieren",
+            ("fa-comments", "CFO-Einwände antizipieren",
              "Welche Gegenargumente kommen? Antworten vorbereiten bevor das Meeting stattfindet."),
-            ("fa-triangle-exclamation", "Was passiert wenn wir nichts tun?",
+            ("fa-circle-exclamation", "Was passiert wenn wir nichts tun?",
              "Entgangener Gewinn pro Monat — den konkreten Preis des Abwartens benennen."),
         ]
 
@@ -1018,45 +1018,61 @@ def step5():
     else:
         st.info("💡 Keine Notizen aus Schritt 3 — fülle die Checkliste aus für eine vollständigere Analyse.")
 
-    # ── Empfehlungs-Vorschlag ─────────────────────────────────────────────────
+    # ── Empfehlungs-Vorschlag (wählbar) ──────────────────────────────────────
     st.markdown(
         "<div style='background:#1E2A5E;border-radius:10px;padding:0.7rem 1.1rem;"
         "margin:0.8rem 0;'><span style='color:#F5F0E6;font-weight:700;"
-        "font-size:0.9rem;'>🎯 Empfehlungs-Richtung (vor der Berechnung)</span></div>",
+        "font-size:0.9rem;'>🎯 Empfehlungs-Richtung wählen</span>"
+        "<span style='color:#B8BCDE;font-size:0.78rem;'>"
+        " &nbsp;·&nbsp; Deine Einschätzung vor der Berechnung</span></div>",
         unsafe_allow_html=True
     )
-    col_r1, col_r2, col_r3 = st.columns(3, gap="medium")
-    with col_r1:
+
+    options = {
+        "🎓 Volltraining": {
+            "sub": "10 Personen, 25.000 €  ·  Maximaler Impact sofort",
+            "border": "#059669", "bg": "#F0FDF4"
+        },
+        "🚀 Pilot + Train-the-Trainer": {
+            "sub": "3 Top-Performer, ~7.500 €  ·  Geringeres Risiko, nachhaltig",
+            "border": "#3B82F6", "bg": "#EFF6FF"
+        },
+        "⏸️ Nicht jetzt": {
+            "sub": "Führungsthemen zuerst adressieren",
+            "border": "#9CA3AF", "bg": "#F9FAFB"
+        },
+    }
+
+    cols = st.columns(3, gap="medium")
+    for i, (opt_label, opt_data) in enumerate(options.items()):
+        with cols[i]:
+            is_sel = (st.session_state.recommendation == opt_label)
+            bg = opt_data["bg"] if is_sel else "white"
+            border_w = "3px" if is_sel else "1.5px"
+            st.markdown(
+                f"<div style='background:{bg};border-radius:10px;"
+                f"border:{border_w} solid {opt_data['border']};"
+                f"padding:1.1rem;text-align:center;min-height:110px;'>"
+                f"<div style='font-weight:700;color:#1E2A5E;font-size:0.9rem;"
+                f"margin-bottom:0.4rem;'>{opt_label}</div>"
+                f"<div style='font-size:0.78rem;color:#6B7280;line-height:1.5;'>"
+                f"{opt_data['sub']}</div>"
+                f"{'<div style="margin-top:0.5rem;font-size:0.7rem;font-weight:700;color:' + opt_data['border'] + '">✓ Ausgewählt</div>' if is_sel else ''}"
+                f"</div>",
+                unsafe_allow_html=True
+            )
+            if st.button(f"Wählen", key=f"rec_{i}", use_container_width=True):
+                st.session_state.recommendation = opt_label
+                st.rerun()
+
+    # Show selected recommendation
+    sel = st.session_state.recommendation
+    if sel:
         st.markdown(
-            "<div style='background:white;border-radius:10px;border:2px solid #059669;"
-            "padding:1rem;text-align:center;'>"
-            "<div style='font-size:1.3rem;margin-bottom:0.4rem;'>🎓</div>"
-            "<div style='font-weight:700;color:#1E2A5E;font-size:0.88rem;"
-            "margin-bottom:0.3rem;'>Volltraining</div>"
-            "<div style='font-size:0.78rem;color:#6B7280;line-height:1.4;'>"
-            "10 Personen, 25.000 €<br>Maximaler Impact sofort</div></div>",
-            unsafe_allow_html=True
-        )
-    with col_r2:
-        st.markdown(
-            "<div style='background:white;border-radius:10px;border:2px solid #3B82F6;"
-            "padding:1rem;text-align:center;'>"
-            "<div style='font-size:1.3rem;margin-bottom:0.4rem;'>🚀</div>"
-            "<div style='font-weight:700;color:#1E2A5E;font-size:0.88rem;"
-            "margin-bottom:0.3rem;'>Pilot + Train-the-Trainer</div>"
-            "<div style='font-size:0.78rem;color:#6B7280;line-height:1.4;'>"
-            "3 Top-Performer, ~7.500 €<br>Geringeres Risiko, nachhaltig</div></div>",
-            unsafe_allow_html=True
-        )
-    with col_r3:
-        st.markdown(
-            "<div style='background:white;border-radius:10px;border:2px solid #9CA3AF;"
-            "padding:1rem;text-align:center;'>"
-            "<div style='font-size:1.3rem;margin-bottom:0.4rem;'>⏸️</div>"
-            "<div style='font-weight:700;color:#1E2A5E;font-size:0.88rem;"
-            "margin-bottom:0.3rem;'>Nicht jetzt</div>"
-            "<div style='font-size:0.78rem;color:#6B7280;line-height:1.4;'>"
-            "Führungsthemen zuerst<br>adressieren</div></div>",
+            f"<div style='background:#EEF0F8;border-radius:8px;padding:0.6rem 1rem;"
+            f"margin-top:0.5rem;font-size:0.85rem;color:#1E2A5E;'>"
+            f"<strong>Deine Wahl:</strong> {sel} — "
+            f"wird in den Kalkulator und das Executive Summary übernommen.</div>",
             unsafe_allow_html=True
         )
 
@@ -1131,23 +1147,45 @@ def step6():
 
     st.markdown("<hr>", unsafe_allow_html=True)
 
+    # Connect recommendation from step 5
+    rec = st.session_state.get("recommendation", "🎓 Volltraining")
+    is_pilot = "Pilot" in rec
+    is_skip  = "jetzt" in rec
+
+    if is_skip:
+        st.warning("⏸️ Du hast in der Datensynthese 'Nicht jetzt' gewählt. "
+                   "Du kannst trotzdem rechnen — z.B. um zu zeigen was das Abwarten kostet.")
+
+    # Scenario indicator
+    st.markdown(
+        f"<div style='background:{'#EFF6FF' if is_pilot else '#F0FDF4'};"
+        f"border-radius:8px;border-left:4px solid {'#3B82F6' if is_pilot else '#059669'};"
+        f"padding:0.6rem 1rem;margin-bottom:1rem;font-size:0.87rem;color:#1E2A5E;'>"
+        f"<strong>Szenario aus Datensynthese:</strong> {rec} — "
+        f"{'Teilnehmerzahl auf 3 voreingestellt' if is_pilot else 'Teilnehmerzahl auf 10 voreingestellt'}"
+        f"</div>",
+        unsafe_allow_html=True
+    )
+
+    default_p = 3 if is_pilot else 10
+    lp = st.session_state.get("loaded_params", {})
+
     col_l, col_r = st.columns(2, gap="large")
     with col_l:
-        st.markdown("**🎓&nbsp; Das Training**",
-                    unsafe_allow_html=True)
-        participants  = st.number_input("Teilnehmer", 1, 50, 10)
-        cost_pp       = st.number_input("Kosten pro Person (€)", 500, 20000, 2500, 100)
-        t_days        = st.number_input("Trainingstage", 1, 10, 3)
-        daily_rate    = st.number_input("Tagessatz Ausfall/MA (€)", 100, 2000, 400, 50)
+        st.markdown("**🎓&nbsp; Das Training**", unsafe_allow_html=True)
+        participants  = st.number_input("Teilnehmer", 1, 50, lp.get("participants", default_p))
+        cost_pp       = st.number_input("Kosten pro Person (€)", 500, 20000, lp.get("cost_per_person", 2500), 100)
+        t_days        = st.number_input("Trainingstage", 1, 10, lp.get("training_days", 3))
+        daily_rate    = st.number_input("Tagessatz Ausfall/MA (€)", 100, 2000, lp.get("daily_rate", 400), 50)
 
     with col_r:
         st.markdown("**📊&nbsp; Sales-Metriken — aus dem Gespräch**",
                     unsafe_allow_html=True)
-        leads         = st.number_input("Leads pro Monat", 10, 1000, 200, 10)
-        curr_rate     = st.slider("Abschlussquote aktuell (%)", 1.0, 50.0, 15.0, 0.5)
-        tgt_rate      = st.slider("Abschlussquote Ziel (%)", 1.0, 50.0, 25.0, 0.5)
-        deal_val      = st.number_input("Ø Deal-Wert (€)", 1000, 500000, 15000, 500)
-        margin        = st.slider("Marge pro Deal (%)", 5.0, 80.0, 25.0, 1.0)
+        leads         = st.number_input("Leads pro Monat", 10, 1000, lp.get("monthly_leads", 200), 10)
+        curr_rate     = st.slider("Abschlussquote aktuell (%)", 1.0, 50.0, float(lp.get("current_rate", 15.0)), 0.5)
+        tgt_rate      = st.slider("Abschlussquote Ziel (%)", 1.0, 50.0, float(lp.get("target_rate", 25.0)), 0.5)
+        deal_val      = st.number_input("Ø Deal-Wert (€)", 1000, 500000, lp.get("deal_value", 15000), 500)
+        margin        = st.slider("Marge pro Deal (%)", 5.0, 80.0, float(lp.get("margin_rate", 25.0)), 1.0)
 
     p = Params(participants, cost_pp, leads, curr_rate, tgt_rate, deal_val, margin, t_days, daily_rate)
     r = calculate(p)
@@ -1157,11 +1195,11 @@ def step6():
     st.markdown("<hr>", unsafe_allow_html=True)
 
     kpis = [
-        ("fa-money-bill-wave",  "Gesamtinvestition", fmt(r["total"]),     "Training + Ausfallzeit"),
-        ("fa-arrow-trend-up",   "Zusatzgewinn/Mo.",  fmt(r["mm"]),         f"+{r['ad']:.1f} Deals × {margin}%"),
+        ("fa-sack-dollar",  "Gesamtinvestition", fmt(r["total"]),     "Training + Ausfallzeit"),
+        ("fa-chart-simple",   "Zusatzgewinn/Mo.",  fmt(r["mm"]),         f"+{r['ad']:.1f} Deals × {margin}%"),
         ("fa-sack-dollar",      "Jahresgewinn",      fmt(r["am"]),         "nach 12 Monaten"),
         ("fa-percent",          "ROI",               f"{r['roi']:.0f}%",   fmt(r["net"]) + " Nettogewinn"),
-        ("fa-hourglass-half",   "Payback",           f"{r['pb']:.1f} Mon.", "bis Break-even"),
+        ("fa-rotate-left",   "Payback",           f"{r['pb']:.1f} Mon.", "bis Break-even"),
     ]
 
     kpi_html = '<div class="kpi-grid">'
@@ -1480,16 +1518,16 @@ def step7():
             ("fa-sack-dollar",      "Gewinn, nicht Umsatz",
              f"Das Training generiert {fmt(r['am'])} zusätzlichen Jahresgewinn — "
              "kein Umsatzversprechen, sondern echter Deckungsbeitrag."),
-            ("fa-clock-rotate-left","Schnelle Amortisation",
+            ("fa-rotate-left","Schnelle Amortisation",
              f"Die Investition zahlt sich in {r['pb']:.1f} Monaten zurück — "
              "schneller als jede Software-Einführung."),
-            ("fa-fire",             "Opportunitätskosten des Abwartens",
+            ("fa-bolt",             "Opportunitätskosten des Abwartens",
              f"Jeder Monat ohne Training kostet {fmt(r['mm'])} entgangenen Gewinn. "
              "Nichts-Tun ist nicht kostenlos."),
-            ("fa-shield",           "Begrenzter Downside",
+            ("fa-umbrella",           "Begrenzter Downside",
              f"Selbst bei nur 20% Abschlussquote bleibt der ROI positiv. "
              "Das Risiko ist asymmetrisch."),
-            ("fa-star",             "Referenzen statt Versprechen",
+            ("fa-certificate",             "Referenzen statt Versprechen",
              "Zwei Kunden des Anbieters haben 22–28% erreicht. "
              "Das sind Marktdaten, kein Anbieter-Pitch."),
         ]
