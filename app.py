@@ -305,7 +305,7 @@ def init():
     for k, v in {
         "step": 1, "path": None, "max_steps": 7,
         "swifty_messages": [], "params": None, "results": None,
-        "prep_notes": {}
+        "prep_notes": {}, "status_quo": {}
     }.items():
         if k not in st.session_state:
             st.session_state[k] = v
@@ -933,33 +933,48 @@ def step5():
 
     notes = {k: v for k, v in st.session_state.get("prep_notes", {}).items() if v and v.strip()}
 
-    # ── Status Quo Zusammenfassung ────────────────────────────────────────────
+    # ── Status Quo Zusammenfassung (editierbar) ──────────────────────────────
     st.markdown(
         "<div style='background:#1E2A5E;border-radius:10px;padding:0.7rem 1.1rem;"
         "margin-bottom:0.8rem;'><span style='color:#F5F0E6;font-weight:700;"
-        "font-size:0.9rem;'>📊 Status Quo — Was wir wissen</span></div>",
+        "font-size:0.9rem;'>📊 Status Quo — Deine Zahlen eintragen</span>"
+        "<span style='color:#B8BCDE;font-size:0.78rem;'> &nbsp;·&nbsp; anpassbar für euer Unternehmen</span></div>",
         unsafe_allow_html=True
     )
-    status_items = [
-        ("Abschlussquote", "15% — stagnierend seit Q3", "⚠️"),
-        ("Teamgröße", "10 Personen im Sales-Team", "👥"),
-        ("Leads/Monat", "~200", "📥"),
-        ("Ø Deal-Wert", "15.000 €", "💰"),
-        ("Marge", "25%", "📊"),
-        ("Wettbewerb", "Hat Training bereits durchgeführt — 22-28% Quote erreicht", "🏆"),
-    ]
+
     col1, col2 = st.columns(2, gap="medium")
-    for i, (label, value, ico) in enumerate(status_items):
-        with (col1 if i % 2 == 0 else col2):
-            st.markdown(
-                f"<div style='background:white;border-radius:8px;border:1.5px solid #D1CCBF;"
-                f"padding:0.6rem 0.9rem;margin-bottom:0.5rem;display:flex;"
-                f"justify-content:space-between;align-items:center;'>"
-                f"<span style='font-size:0.84rem;color:#6B7280;'>{ico} {label}</span>"
-                f"<span style='font-size:0.84rem;font-weight:700;color:#1E2A5E;'>{value}</span>"
-                f"</div>",
-                unsafe_allow_html=True
-            )
+    with col1:
+        sq_quote = st.text_input("⚠️ Aktuelle Abschlussquote", 
+            value=st.session_state.status_quo.get("quote", "15% — stagnierend seit Q3"),
+            key="sq_quote")
+        sq_leads = st.text_input("📥 Leads pro Monat",
+            value=st.session_state.status_quo.get("leads", "~200"),
+            key="sq_leads")
+        sq_marge = st.text_input("📊 Marge pro Deal",
+            value=st.session_state.status_quo.get("marge", "25%"),
+            key="sq_marge")
+    with col2:
+        sq_team = st.text_input("👥 Teamgröße",
+            value=st.session_state.status_quo.get("team", "10 Personen im Sales-Team"),
+            key="sq_team")
+        sq_deal = st.text_input("💰 Ø Deal-Wert",
+            value=st.session_state.status_quo.get("deal", "15.000 €"),
+            key="sq_deal")
+        sq_wettb = st.text_input("🏆 Wettbewerb / Benchmark",
+            value=st.session_state.status_quo.get("wettb", "Hat Training bereits durchgeführt — 22-28% Quote erreicht"),
+            key="sq_wettb")
+
+    # Zusätzliches Freitextfeld
+    sq_kontext = st.text_area("📝 Weiterer Kontext (Fluktuation, Teamdynamik, Marktlage ...)",
+        value=st.session_state.status_quo.get("kontext", ""),
+        placeholder="z.B. Fluktuation 18% letztes Jahr, zwei Underperformer im Team, Marktdruck durch neuen Wettbewerber...",
+        height=80, key="sq_kontext")
+
+    # Save to session state
+    st.session_state.status_quo = {
+        "quote": sq_quote, "leads": sq_leads, "marge": sq_marge,
+        "team": sq_team, "deal": sq_deal, "wettb": sq_wettb, "kontext": sq_kontext
+    }
 
     # ── Offene Fragen / Risiken ───────────────────────────────────────────────
     st.markdown(
@@ -1558,6 +1573,44 @@ def step7():
             for k in ["step","path","swifty_messages","params","results"]:
                 st.session_state.pop(k, None)
             st.rerun()
+
+
+# ─── Save / Load ──────────────────────────────────────────────────────────────
+def build_save_data():
+    """Collect all session data into one dict"""
+    r = st.session_state.get("results")
+    p = st.session_state.get("params")
+    return {
+        "version": "1.0",
+        "timestamp": datetime.now().isoformat(),
+        "tool": "HR loves Finance — Joey Business Case",
+        "status_quo": st.session_state.get("status_quo", {}),
+        "prep_notes": st.session_state.get("prep_notes", {}),
+        "params": {
+            "participants":    getattr(p, "participants",    10)  if p else 10,
+            "cost_per_person": getattr(p, "cost_per_person", 2500) if p else 2500,
+            "monthly_leads":   getattr(p, "monthly_leads",  200)  if p else 200,
+            "current_rate":    getattr(p, "current_rate",   15.0) if p else 15.0,
+            "target_rate":     getattr(p, "target_rate",    25.0) if p else 25.0,
+            "deal_value":      getattr(p, "deal_value",     15000) if p else 15000,
+            "margin_rate":     getattr(p, "margin_rate",    25.0) if p else 25.0,
+            "training_days":   getattr(p, "training_days",  3)    if p else 3,
+            "daily_rate":      getattr(p, "daily_rate",     400)  if p else 400,
+        } if p else {},
+        "results": r if not r else {k: round(v, 2) if isinstance(v, float) else v
+                                     for k, v in r.items()},
+    }
+
+def load_save_data(data: dict):
+    """Restore session state from saved dict"""
+    if "status_quo" in data:
+        st.session_state.status_quo = data["status_quo"]
+    if "prep_notes" in data:
+        st.session_state.prep_notes = data["prep_notes"]
+    if "params" in data and data["params"]:
+        p_data = data["params"]
+        st.session_state.loaded_params = p_data  # Store for kalkulator pre-fill
+    st.success("✅ Daten erfolgreich geladen! Gehe zum Kalkulator um die Werte zu sehen.")
 
 
 # ─── Main ─────────────────────────────────────────────────────────────────────
