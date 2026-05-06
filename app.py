@@ -303,7 +303,7 @@ label { color: #1E2A5E !important; font-weight: 500; }
 # ─── Session State ────────────────────────────────────────────────────────────
 def init():
     for k, v in {
-        "step": 1, "path": None,
+        "step": 1, "path": None, "max_steps": 7,
         "swifty_messages": [], "params": None, "results": None,
         "prep_notes": {}
     }.items():
@@ -387,12 +387,13 @@ def swifty_call(messages):
 
 # ─── Progress Bar ─────────────────────────────────────────────────────────────
 STEP_META = [
-    ("fa-comments",    "Das Gespräch"),
-    ("fa-code-branch", "Dein Weg"),
-    ("fa-compass",     "Vorbereitung"),
-    ("fa-handshake",   "Follow-up"),
-    ("fa-calculator",  "Kalkulator"),
-    ("fa-chart-line",  "Ergebnis"),
+    ("fa-comments",       "Das Gespräch"),
+    ("fa-code-branch",    "Dein Weg"),
+    ("fa-compass",        "Vorbereitung"),
+    ("fa-handshake",      "Follow-up"),
+    ("fa-layer-group",    "Datensynthese"),
+    ("fa-calculator",     "Kalkulator"),
+    ("fa-chart-line",     "Ergebnis"),
 ]
 
 
@@ -432,7 +433,7 @@ def svg_icon(name, size=18, color="currentColor"):
       <path d="{path}"/>
     </svg>'''
 
-STEP_ICONS = ["fa-comments","fa-code-branch","fa-compass","fa-handshake","fa-calculator","fa-chart-line"]
+STEP_ICONS = ["fa-comments","fa-code-branch","fa-compass","fa-handshake","fa-layer-group","fa-calculator","fa-chart-line"]
 
 
 
@@ -557,6 +558,7 @@ def render_nav():
         ("fa-code-branch", "Dein Weg"),
         ("fa-compass",     "Vorbereitung"),
         ("fa-handshake",   "Follow-up"),
+        ("fa-layer-group", "Datensynthese"),
         ("fa-calculator",  "Kalkulator"),
         ("fa-chart-line",  "Ergebnis"),
     ]
@@ -732,9 +734,28 @@ def step3():
         st.markdown('<div class="scene-header">Deine Vorbereitungs-Checkliste</div>', unsafe_allow_html=True)
         st.markdown("""
         <div style="font-size:0.78rem;color:#059669;font-weight:700;letter-spacing:0.07em;
-                    text-transform:uppercase;margin-bottom:1.2rem;">
+                    text-transform:uppercase;margin-bottom:0.8rem;">
             ✅ &nbsp;Was Joey klären muss — bevor sie rechnet
         </div>""", unsafe_allow_html=True)
+
+        # Status Quo research hints
+        st.markdown(
+            "<div style='background:#F3F2EE;border-radius:10px;border-left:3px solid #B8BCDE;"
+            "padding:0.9rem 1.1rem;margin-bottom:1.2rem;'>"
+            "<div style='font-weight:700;color:#1E2A5E;font-size:0.88rem;margin-bottom:0.5rem;'>"
+            "🔍 Status Quo recherchieren — bevor du Zahlen sammelst</div>"
+            "<div style='font-size:0.83rem;color:#6B7280;line-height:1.8;'>"
+            "📋 <strong>HR-Daten prüfen:</strong> Fluktuation im Sales-Team (12 Monate), "
+            "Engagement Survey Ergebnisse, Abwesenheitsquote<br>"
+            "🎯 <strong>Performance-Daten:</strong> Wer trifft Ziele — wer nicht? "
+            "Seit wann stagniert die Quote? Gab es früher bessere Werte?<br>"
+            "🏆 <strong>Wettbewerb:</strong> Was weiß Thomas über Konkurrenz-Quoten? "
+            "Gibt es Branchenbenchmarks (z.B. 20-25% ist Branchendurchschnitt)?<br>"
+            "👥 <strong>Teamdynamik:</strong> Letzte Mitarbeitergespräche, "
+            "Feedbackrunden, bekannte Motivationsthemen"
+            "</div></div>",
+            unsafe_allow_html=True
+        )
 
         # Part A: Can answer now
         items_now = [
@@ -837,7 +858,7 @@ def step3():
             pass  # handled by render_checklist_section
 
         st.markdown("<br>", unsafe_allow_html=True)
-        if st.button("Weiter zum Follow-up-Gespräch  →"):
+        if st.button("🤝  Weiter zum Follow-up-Gespräch →"):
             st.session_state.step = 4
             st.rerun()
 
@@ -903,6 +924,135 @@ def step4():
 
 def step5():
     render_progress(5)
+    render_nav()
+    st.markdown('<div class="scene-header">Datensynthese</div>', unsafe_allow_html=True)
+    st.markdown("""
+    <div class="scene-sub">
+        🧩 Alle gesammelten Erkenntnisse — Grundlage für den Business Case
+    </div>""", unsafe_allow_html=True)
+
+    notes = {k: v for k, v in st.session_state.get("prep_notes", {}).items() if v and v.strip()}
+
+    # ── Status Quo Zusammenfassung ────────────────────────────────────────────
+    st.markdown(
+        "<div style='background:#1E2A5E;border-radius:10px;padding:0.7rem 1.1rem;"
+        "margin-bottom:0.8rem;'><span style='color:#F5F0E6;font-weight:700;"
+        "font-size:0.9rem;'>📊 Status Quo — Was wir wissen</span></div>",
+        unsafe_allow_html=True
+    )
+    status_items = [
+        ("Abschlussquote", "15% — stagnierend seit Q3", "⚠️"),
+        ("Teamgröße", "10 Personen im Sales-Team", "👥"),
+        ("Leads/Monat", "~200", "📥"),
+        ("Ø Deal-Wert", "15.000 €", "💰"),
+        ("Marge", "25%", "📊"),
+        ("Wettbewerb", "Hat Training bereits durchgeführt — 22-28% Quote erreicht", "🏆"),
+    ]
+    col1, col2 = st.columns(2, gap="medium")
+    for i, (label, value, ico) in enumerate(status_items):
+        with (col1 if i % 2 == 0 else col2):
+            st.markdown(
+                f"<div style='background:white;border-radius:8px;border:1.5px solid #D1CCBF;"
+                f"padding:0.6rem 0.9rem;margin-bottom:0.5rem;display:flex;"
+                f"justify-content:space-between;align-items:center;'>"
+                f"<span style='font-size:0.84rem;color:#6B7280;'>{ico} {label}</span>"
+                f"<span style='font-size:0.84rem;font-weight:700;color:#1E2A5E;'>{value}</span>"
+                f"</div>",
+                unsafe_allow_html=True
+            )
+
+    # ── Offene Fragen / Risiken ───────────────────────────────────────────────
+    st.markdown(
+        "<div style='background:#FEF3C7;border-left:4px solid #D97706;border-radius:10px;"
+        "padding:0.9rem 1.1rem;margin:0.8rem 0;'>"
+        "<div style='font-weight:700;color:#92400E;margin-bottom:0.4rem;'>⚠️ Offene Fragen — noch zu klären</div>"
+        "<div style='font-size:0.87rem;color:#92400E;line-height:1.8;'>"
+        "• Zwei Teammitglieder verfehlen Ziele dauerhaft — Führungsgespräch nötig<br>"
+        "• Feedbackroutinen und Erwartungsklarheit könnten gestärkt werden<br>"
+        "• Pilot (Top-Performer) vs. Volltraining — Entscheidung steht noch aus<br>"
+        "• Train-the-Trainer Konzept als Phase 2 zu definieren"
+        "</div></div>",
+        unsafe_allow_html=True
+    )
+
+    # ── Erkenntnisse aus Vorbereitung ─────────────────────────────────────────
+    st.markdown(
+        "<div style='background:#1E2A5E;border-radius:10px;padding:0.7rem 1.1rem;"
+        "margin:0.8rem 0;'><span style='color:#F5F0E6;font-weight:700;"
+        "font-size:0.9rem;'>✏️ Deine Erkenntnisse aus der Vorbereitung</span></div>",
+        unsafe_allow_html=True
+    )
+    if notes:
+        for q, a in notes.items():
+            col_q, col_a = st.columns([1, 1], gap="medium")
+            with col_q:
+                st.markdown(
+                    f"<div style='background:#EEF0F8;border-radius:8px;"
+                    f"padding:0.6rem 0.85rem;font-size:0.84rem;"
+                    f"font-weight:600;color:#1E2A5E;'>{q}</div>",
+                    unsafe_allow_html=True
+                )
+            with col_a:
+                st.markdown(
+                    f"<div style='background:white;border-radius:8px;"
+                    f"border:1.5px solid #D1CCBF;padding:0.6rem 0.85rem;"
+                    f"font-size:0.84rem;color:#374151;'>{a}</div>",
+                    unsafe_allow_html=True
+                )
+            st.markdown("<div style='height:3px'></div>", unsafe_allow_html=True)
+    else:
+        st.info("💡 Keine Notizen aus Schritt 3 — fülle die Checkliste aus für eine vollständigere Analyse.")
+
+    # ── Empfehlungs-Vorschlag ─────────────────────────────────────────────────
+    st.markdown(
+        "<div style='background:#1E2A5E;border-radius:10px;padding:0.7rem 1.1rem;"
+        "margin:0.8rem 0;'><span style='color:#F5F0E6;font-weight:700;"
+        "font-size:0.9rem;'>🎯 Empfehlungs-Richtung (vor der Berechnung)</span></div>",
+        unsafe_allow_html=True
+    )
+    col_r1, col_r2, col_r3 = st.columns(3, gap="medium")
+    with col_r1:
+        st.markdown(
+            "<div style='background:white;border-radius:10px;border:2px solid #059669;"
+            "padding:1rem;text-align:center;'>"
+            "<div style='font-size:1.3rem;margin-bottom:0.4rem;'>🎓</div>"
+            "<div style='font-weight:700;color:#1E2A5E;font-size:0.88rem;"
+            "margin-bottom:0.3rem;'>Volltraining</div>"
+            "<div style='font-size:0.78rem;color:#6B7280;line-height:1.4;'>"
+            "10 Personen, 25.000 €<br>Maximaler Impact sofort</div></div>",
+            unsafe_allow_html=True
+        )
+    with col_r2:
+        st.markdown(
+            "<div style='background:white;border-radius:10px;border:2px solid #3B82F6;"
+            "padding:1rem;text-align:center;'>"
+            "<div style='font-size:1.3rem;margin-bottom:0.4rem;'>🚀</div>"
+            "<div style='font-weight:700;color:#1E2A5E;font-size:0.88rem;"
+            "margin-bottom:0.3rem;'>Pilot + Train-the-Trainer</div>"
+            "<div style='font-size:0.78rem;color:#6B7280;line-height:1.4;'>"
+            "3 Top-Performer, ~7.500 €<br>Geringeres Risiko, nachhaltig</div></div>",
+            unsafe_allow_html=True
+        )
+    with col_r3:
+        st.markdown(
+            "<div style='background:white;border-radius:10px;border:2px solid #9CA3AF;"
+            "padding:1rem;text-align:center;'>"
+            "<div style='font-size:1.3rem;margin-bottom:0.4rem;'>⏸️</div>"
+            "<div style='font-weight:700;color:#1E2A5E;font-size:0.88rem;"
+            "margin-bottom:0.3rem;'>Nicht jetzt</div>"
+            "<div style='font-size:0.78rem;color:#6B7280;line-height:1.4;'>"
+            "Führungsthemen zuerst<br>adressieren</div></div>",
+            unsafe_allow_html=True
+        )
+
+    st.markdown("<br>", unsafe_allow_html=True)
+    if st.button("🧮  Weiter zum Kalkulator →"):
+        st.session_state.step = 6
+        st.rerun()
+
+
+def step6():
+    render_progress(6)
     render_nav()
     st.markdown('<div class="scene-header">Der Kalkulator</div>', unsafe_allow_html=True)
     st.markdown("""
@@ -1015,7 +1165,7 @@ def step5():
 
     st.markdown("<br>", unsafe_allow_html=True)
     if st.button("Weiter zur Argumentation  →"):
-        st.session_state.step = 6
+        st.session_state.step = 7
         st.rerun()
 
 
@@ -1225,8 +1375,8 @@ def generate_pdf(r, p):
 
 
 
-def step6():
-    render_progress(6)
+def step7():
+    render_progress(7)
     render_nav()
     r = st.session_state.results
     p = st.session_state.params
@@ -1234,7 +1384,7 @@ def step6():
     if not r or not p:
         st.warning("Bitte zuerst den Kalkulator ausfüllen.")
         if st.button("← Zurück"):
-            st.session_state.step = 5
+            st.session_state.step = 6
             st.rerun()
         return
 
@@ -1436,6 +1586,7 @@ def main():
     elif step == 4: step4()
     elif step == 5: step5()
     elif step == 6: step6()
+    elif step == 7: step7()
 
     st.markdown("""
     <div class="footer">
