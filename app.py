@@ -32,9 +32,9 @@ st.markdown("""
 # ─── CSS ─────────────────────────────────────────────────────────────────────
 st.markdown("""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap');
+/* Segoe UI — system font, no import needed */
 
-html, body, [class*="css"] { font-family: 'DM Sans', sans-serif; }
+html, body, [class*="css"] { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; }
 .stApp { background-color: #F5F0E6; }
 
 /* ── Progress ── */
@@ -67,7 +67,7 @@ html, body, [class*="css"] { font-family: 'DM Sans', sans-serif; }
 
 /* ── Typography ── */
 .scene-header {
-    font-family: 'DM Serif Display', serif;
+    font-family: 'Segoe UI', system-ui, sans-serif;
     color: #1E2A5E; font-size: 1.9rem; margin-bottom: 0.25rem;
 }
 .scene-sub {
@@ -107,7 +107,7 @@ html, body, [class*="css"] { font-family: 'DM Sans', sans-serif; }
 
 /* ── Choice Cards ── */
 .choice-title {
-    font-family: 'DM Serif Display', serif;
+    font-family: 'Segoe UI', system-ui, sans-serif;
     color: #1E2A5E; font-size: 1.25rem; margin: 1.2rem 0 1.1rem;
 }
 .choice-card-navy {
@@ -126,11 +126,11 @@ html, body, [class*="css"] { font-family: 'DM Sans', sans-serif; }
 .ci-navy  { background: rgba(184,188,222,0.25); color: #B8BCDE; }
 .ci-light { background: #F5F0E6; color: #1E2A5E; }
 .choice-card-navy h3  {
-    font-family: 'DM Serif Display', serif; font-size: 1.15rem;
+    font-family: 'Segoe UI', system-ui, sans-serif; font-size: 1.15rem;
     color: #F5F0E6; margin-bottom: 0.5rem;
 }
 .choice-card-light h3 {
-    font-family: 'DM Serif Display', serif; font-size: 1.15rem;
+    font-family: 'Segoe UI', system-ui, sans-serif; font-size: 1.15rem;
     color: #1E2A5E; margin-bottom: 0.5rem;
 }
 .choice-card-navy p  { font-size: 0.87rem; color: #B8BCDE; line-height: 1.7; }
@@ -189,7 +189,7 @@ html, body, [class*="css"] { font-family: 'DM Sans', sans-serif; }
     letter-spacing: 0.08em; color: #B8BCDE; margin-bottom: 0.25rem;
 }
 .kpi-value {
-    font-family: 'DM Serif Display', serif;
+    font-family: 'Segoe UI', system-ui, sans-serif;
     font-size: 1.55rem; color: #F5F0E6; line-height: 1;
 }
 .kpi-sub { font-size: 0.68rem; color: #B8BCDE; margin-top: 0.2rem; }
@@ -252,7 +252,7 @@ html, body, [class*="css"] { font-family: 'DM Sans', sans-serif; }
     background: #1E2A5E !important; color: #F5F0E6 !important;
     border: none !important; border-radius: 8px !important;
     padding: 0.55rem 1.4rem !important;
-    font-family: 'DM Sans', sans-serif !important;
+    font-family: 'Segoe UI', system-ui, sans-serif !important;
     font-weight: 500 !important; font-size: 0.9rem !important;
     transition: opacity 0.2s !important;
 }
@@ -466,7 +466,7 @@ def make_charts(r):
     fig.update_layout(
         height=310, showlegend=False,
         plot_bgcolor=cream, paper_bgcolor=cream,
-        font=dict(family="DM Sans, sans-serif", color=navy),
+        font=dict(family="Segoe UI, system-ui, sans-serif", color=navy),
         margin=dict(t=45, b=10, l=10, r=10)
     )
     fig.update_xaxes(showgrid=False, linecolor="#EAE7DF")
