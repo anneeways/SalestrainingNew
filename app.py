@@ -363,55 +363,53 @@ STEP_META = [
 
 def render_progress(current):
     label_text = STEP_META[current - 1][1]
-
-    st.markdown(f"""
-    <div class="progress-label">
-        📍&nbsp;
-        Schritt {current} von {len(STEP_META)} — {label_text}
-    </div>""", unsafe_allow_html=True)
-
-    cols = st.columns(len(STEP_META) * 2 - 1)
+    
+    # Build entire progress bar as one HTML string — no st.columns
+    dots_html = ""
     for i, (icon, label) in enumerate(STEP_META, 1):
-        col_idx = (i - 1) * 2
         if i < current:
-            bg, color = "#B8BCDE", "#1E2A5E"
+            bg, color, weight = "#B8BCDE", "#1E2A5E", "500"
+            lcolor = "#1E2A5E"
         elif i == current:
-            bg, color = "#1E2A5E", "#F5F0E6"
+            bg, color, weight = "#1E2A5E", "#F5F0E6", "700"
+            lcolor = "#1E2A5E"
+            shadow = "box-shadow:0 0 0 3px rgba(30,42,94,0.18);"
         else:
-            bg, color = "#E5E1D8", "#C4C0B8"
-
+            bg, color, weight = "#E5E1D8", "#C4C0B8", "400"
+            lcolor = "#C4C0B8"
+        
         shadow = "box-shadow:0 0 0 3px rgba(30,42,94,0.18);" if i == current else ""
-        label_color = "#1E2A5E" if i <= current else "#C4C0B8"
-        label_weight = "600" if i == current else "400"
-
-        with cols[col_idx]:
-            st.markdown(f"""
-            <div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
-                <div style="width:32px;height:32px;border-radius:50%;
-                            background:{bg};color:{color};{shadow}
-                            display:flex;align-items:center;justify-content:center;
-                            font-size:0.75rem;margin:0 auto;">
-                    
-                </div>
-                <div style="font-size:0.62rem;color:{label_color};text-align:center;
-                            font-weight:{label_weight};white-space:nowrap;">{label}</div>
-            </div>""", unsafe_allow_html=True)
-
+        lcolor = "#1E2A5E" if i <= current else "#C4C0B8"
+        lweight = "700" if i == current else "400"
+        
+        dots_html += f"""
+        <div style="display:flex;flex-direction:column;align-items:center;gap:3px;flex:1;">
+          <div style="width:32px;height:32px;border-radius:50%;background:{bg};color:{color};
+                      {shadow}display:flex;align-items:center;justify-content:center;
+                      font-size:1rem;">{icon}</div>
+          <div style="font-size:0.6rem;color:{lcolor};font-weight:{lweight};
+                      text-align:center;white-space:nowrap;">{label}</div>
+        </div>"""
+        
         if i < len(STEP_META):
-            line_color = "#B8BCDE" if i < current else "#E5E1D8"
-            with cols[col_idx + 1]:
-                st.markdown(f"""
-                <div style="height:32px;display:flex;align-items:center;padding:0 2px;">
-                    <div style="height:2px;width:100%;background:{line_color};border-radius:1px;"></div>
-                </div>""", unsafe_allow_html=True)
-
-    st.markdown("<div style='margin-bottom:1.8rem;'></div>", unsafe_allow_html=True)
+            lc = "#B8BCDE" if i < current else "#E5E1D8"
+            dots_html += f"""
+        <div style="flex:2;height:2px;background:{lc};border-radius:1px;margin-bottom:18px;"></div>"""
+    
+    st.markdown(f"""
+    <div style="font-size:0.7rem;color:#9CA3AF;letter-spacing:0.07em;
+                text-transform:uppercase;font-weight:600;margin-bottom:0.7rem;">
+        📍 Schritt {current} von {len(STEP_META)} — {label_text}
+    </div>
+    <div style="display:flex;align-items:center;gap:0;margin-bottom:1.8rem;">
+        {dots_html}
+    </div>""", unsafe_allow_html=True)
 
 
 # ─── Speaker Helper ───────────────────────────────────────────────────────────
 def dialogue(speaker, text, kind="joey"):
     """kind: joey | vl | thought"""
-    icons = {"joey": "fa-user", "vl": "fa-briefcase", "thought": "fa-ellipsis"}
+    icons = {"joey": "J", "vl": "T", "thought": "···"}
     av_cls = {"joey": "av-joey", "vl": "av-vl", "thought": "av-thought"}
     sn_cls = {"joey": "sn-joey", "vl": "sn-vl", "thought": "sn-thought"}
     txt_cls = "dialogue-thought" if kind == "thought" else "dialogue-text"
