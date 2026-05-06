@@ -23,15 +23,10 @@ st.set_page_config(
 )
 
 # ─── Font Awesome ─────────────────────────────────────────────────────────────
-st.markdown("""
-<link rel="stylesheet"
-  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
-  crossorigin="anonymous" referrerpolicy="no-referrer" />
-""", unsafe_allow_html=True)
-
 # ─── CSS ─────────────────────────────────────────────────────────────────────
 st.markdown("""
 <style>
+@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css');
 /* Segoe UI — system font, no import needed */
 
 html, body, [class*="css"] { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; }
