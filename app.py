@@ -485,144 +485,31 @@ STEP_ICONS = ["fa-comment-dots","fa-arrow-right-arrow-left","fa-list-check","fa-
 
 def render_progress(current):
     n = len(STEP_META)
-    names = [s[1] for s in STEP_META]
-
-    # Step label
-    st.markdown(
-        f"<p style='font-size:0.72rem;color:#9CA3AF;letter-spacing:0.07em;text-transform:uppercase;font-weight:600;margin-bottom:0.5rem;'><i class='fa-solid fa-location-dot'></i>&nbsp;Schritt {current} von {n} — {names[current-1]}</p>",
-        unsafe_allow_html=True
-    )
-
-    # Progress bar
     st.progress(current / n)
+    st.markdown("<div style='height:4px'></div>", unsafe_allow_html=True)
 
-    # Step dots — hidden on mobile, visible on desktop
-    st.markdown("<div class='progress-mobile-hide'>", unsafe_allow_html=True)
-    cols = st.columns(n)
-    for i, (_, name) in enumerate(STEP_META, 1):
-        step_icon_name = STEP_ICONS[i-1]
-        if i < current:
-            bg, fg, opacity, lcolor = "#B8BCDE", "#1E2A5E", "1", "#9CA3AF"
-        elif i == current:
-            bg, fg, opacity, lcolor = "#1E2A5E", "#F5F0E6", "1", "#1E2A5E"
-        else:
-            bg, fg, opacity, lcolor = "#E5E1D8", "#C4C0B8", "0.5", "#C4C0B8"
 
-        shadow = "box-shadow:0 0 0 3px rgba(30,42,94,0.15);" if i == current else ""
-        fw = "700" if i == current else "400"
-
-        with cols[i-1]:
-            fa_icon = STEP_META[i-1][0]
+def render_nav():
+    """Simple text navigation — current step highlighted navy"""
+    current = st.session_state.get("step", 1)
+    labels = [s[1] for s in STEP_META]
+    cols = st.columns(len(labels))
+    for i, (col, label) in enumerate(zip(cols, labels), 1):
+        with col:
+            is_cur = (i == current)
             st.markdown(
-                f"<div style='text-align:center;opacity:{opacity};'>"
-                f"<div style='width:34px;height:34px;border-radius:50%;"
-                f"background:{bg};{shadow}display:flex;align-items:center;"
-                f"justify-content:center;margin:0 auto 4px;font-size:0.85rem;color:{fg};'>"
-                f"<i class='fa-solid {fa_icon}'></i>"
-                f"</div>"
-                f"<div style='font-size:0.69rem;color:{lcolor};font-weight:{fw};"
-                f"white-space:nowrap;'>{name}</div>"
-                f"</div>",
+                f"<div style='text-align:center;padding:0.4rem 0.2rem;"
+                f"border-bottom:3px solid {'#1E2A5E' if is_cur else 'transparent'};"
+                f"font-size:0.78rem;font-weight:{'700' if is_cur else '400'};"
+                f"color:{'#1E2A5E' if is_cur else '#9CA3AF'};"
+                f"cursor:pointer;white-space:nowrap;'>{label}</div>",
                 unsafe_allow_html=True
             )
-    st.markdown("</div>", unsafe_allow_html=True)
-    st.markdown("<div style='margin-bottom:0.8rem;'></div>", unsafe_allow_html=True)
-# ─── Speaker Helper ───────────────────────────────────────────────────────────
-def dialogue(speaker, text, kind="joey"):
-    """kind: joey | vl | thought"""
-    fa_map  = {"joey": "fa-user", "vl": "fa-briefcase", "thought": "fa-ellipsis"}
-    av_cls  = {"joey": "av-joey", "vl": "av-vl",        "thought": "av-thought"}
-    sn_cls  = {"joey": "sn-joey", "vl": "sn-vl",        "thought": "sn-thought"}
-    fg_col  = {"joey": "#F5F0E6", "vl": "#6B7280",       "thought": "#9CA3AF"}
-    txt_cls = "dialogue-thought" if kind == "thought" else "dialogue-text"
-    fa  = fa_map.get(kind, "fa-user")
-    av  = av_cls.get(kind, "av-joey")
-    sn  = sn_cls.get(kind, "sn-joey")
-    fg  = fg_col.get(kind, "#F5F0E6")
-    return f"""
-    <div class="dialogue-box">
-        <div class="speaker-row">
-            <div class="speaker-avatar {av}" style="font-size:0.75rem;">
-                <i class="fa-solid {fa}" style="color:{fg};"></i>
-            </div>
-            <div class="speaker-name {sn}">{speaker}</div>
-        </div>
-        <div class="{txt_cls}">„{text}"</div>
-    </div>"""
-
-
-# ─── Charts ───────────────────────────────────────────────────────────────────
-def make_charts(r):
-    navy, lav, cream = "#1E2A5E", "#B8BCDE", "#F5F0E6"
-    fig = make_subplots(
-        rows=1, cols=2,
-        subplot_titles=("Investition vs. Jahresgewinn", "Break-even Verlauf"),
-        horizontal_spacing=0.12
-    )
-    fig.add_trace(go.Bar(
-        x=["Investition", "Jahresgewinn"],
-        y=[r["total"], r["am"]],
-        marker_color=[lav, navy],
-        text=[fmt(r["total"]), fmt(r["am"])],
-        textposition="auto",
-        textfont=dict(color=[navy, cream]),
-    ), row=1, col=1)
-
-    months = list(range(13))
-    cum = [-r["total"]]
-    for _ in range(12): cum.append(cum[-1] + r["mm"])
-
-    fig.add_trace(go.Scatter(
-        x=months, y=cum, mode="lines+markers",
-        line=dict(color=navy, width=3),
-        marker=dict(color=navy, size=7),
-        fill="tozeroy", fillcolor="rgba(30,42,94,0.08)",
-    ), row=1, col=2)
-    fig.add_hline(y=0, line_dash="dash", line_color="#DC2626",
-                  annotation_text=f"  Break-even: Monat {r['pb']:.1f}",
-                  annotation_font_color="#DC2626", row=1, col=2)
-
-    fig.update_layout(
-        height=310, showlegend=False,
-        plot_bgcolor=cream, paper_bgcolor=cream,
-        font=dict(family="Segoe UI, system-ui, sans-serif", color=navy),
-        margin=dict(t=45, b=10, l=10, r=10)
-    )
-    fig.update_xaxes(showgrid=False, linecolor="#EAE7DF")
-    fig.update_yaxes(showgrid=True, gridcolor="#EAE7DF", linecolor="#EAE7DF")
-    return fig
-
-
-# ═══════════════════════════════════════════════════════════════════════════════
-# STEPS
-# ═══════════════════════════════════════════════════════════════════════════════
-
-# ─── Navigation ───────────────────────────────────────────────────────────────
-def render_nav():
-    """Jump-to navigation between steps"""
-    current = st.session_state.get("step", 1)
-    nav_meta = [
-        ("fa-comment-dots",    "Gespräch"),
-        ("fa-arrow-right-arrow-left", "Dein Weg"),
-        ("fa-list-check",     "Vorbereitung"),
-        ("fa-people-arrows",   "Follow-up"),
-        ("fa-magnifying-glass-chart", "Datensynthese"),
-        ("fa-calculator",  "Kalkulator"),
-        ("fa-award",  "Ergebnis"),
-    ]
-    # Navigation buttons
-    cols = st.columns(7)  # 7 steps
-    for i, (col, (fa, label)) in enumerate(zip(cols, nav_meta), 1):
-        with col:
-            is_cur = (i == st.session_state.get("step", 1))
-            if st.button(
-                label,
-                key=f"nav_jump_{i}",
-                use_container_width=True,
-                type="primary" if is_cur else "secondary"
-            ):
+            if st.button(label, key=f"nav_{i}", use_container_width=True,
+                         label_visibility="collapsed"):
                 st.session_state.step = i
                 st.rerun()
+    st.markdown("<div style='margin-bottom:1rem;'></div>", unsafe_allow_html=True)
 
 
 def step1():
