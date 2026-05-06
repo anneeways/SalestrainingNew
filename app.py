@@ -23,6 +23,15 @@ st.set_page_config(
 )
 
 # ─── Font Awesome ─────────────────────────────────────────────────────────────
+# ─── Load Font Awesome via multiple fallback methods ─────────────────────────
+st.markdown("""
+<style>
+@import url('https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css');
+</style>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+""", unsafe_allow_html=True)
+
 # ─── CSS ─────────────────────────────────────────────────────────────────────
 st.markdown("""
 <style>
@@ -353,16 +362,16 @@ def swifty_call(messages):
 
 # ─── Progress Bar ─────────────────────────────────────────────────────────────
 STEP_META = [
-    ("💬", "Das Gespräch"),
-    ("🔀", "Dein Weg"),
-    ("🧭", "Vorbereitung"),
-    ("🤝", "Follow-up"),
-    ("🧮", "Kalkulator"),
-    ("📊", "Ergebnis"),
+    ("fa-comments",    "Das Gespräch"),
+    ("fa-code-branch", "Dein Weg"),
+    ("fa-compass",     "Vorbereitung"),
+    ("fa-handshake",   "Follow-up"),
+    ("fa-calculator",  "Kalkulator"),
+    ("fa-chart-line",  "Ergebnis"),
 ]
 
 # ─── Inline SVG Icons (no CDN needed) ────────────────────────────────────────
-def icon(name, size=18, color="currentColor"):
+def svg_icon(name, size=18, color="currentColor"):
     """Return inline SVG for given icon name"""
     paths = {
         "chat":       "M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z",
@@ -395,7 +404,7 @@ def icon(name, size=18, color="currentColor"):
       <path d="{path}"/>
     </svg>'''
 
-STEP_ICONS = ["chat","fork","compass","handshake","calculator","chart"]
+STEP_ICONS = ["fa-comments","fa-code-branch","fa-compass","fa-handshake","fa-calculator","fa-chart-line"]
 
 
 
@@ -405,9 +414,7 @@ def render_progress(current):
 
     # Step label
     st.markdown(
-        f"<p style='font-size:0.72rem;color:#9CA3AF;letter-spacing:0.07em;"
-        f"text-transform:uppercase;font-weight:600;margin-bottom:0.5rem;'>"
-        f"{icon('location',14,'#9CA3AF')} &nbsp;Schritt {current} von {n} — {names[current-1]}</p>",
+        f"<p style='font-size:0.72rem;color:#9CA3AF;letter-spacing:0.07em;text-transform:uppercase;font-weight:600;margin-bottom:0.5rem;'><i class='fa-solid fa-location-dot'></i>&nbsp;Schritt {current} von {n} — {names[current-1]}</p>",
         unsafe_allow_html=True
     )
 
@@ -429,15 +436,16 @@ def render_progress(current):
         fw = "700" if i == current else "400"
 
         with cols[i-1]:
+            fa_icon = STEP_META[i-1][0]
             st.markdown(
                 f"<div style='text-align:center;opacity:{opacity};'>"
-                f"<div style='width:32px;height:32px;border-radius:50%;"
+                f"<div style='width:34px;height:34px;border-radius:50%;"
                 f"background:{bg};{shadow}display:flex;align-items:center;"
-                f"justify-content:center;margin:0 auto 3px;'>"
-                f"{icon(step_icon_name, 14, fg)}"
+                f"justify-content:center;margin:0 auto 4px;font-size:0.85rem;color:{fg};'>"
+                f"<i class='fa-solid {fa_icon}'></i>"
                 f"</div>"
-                f"<div style='font-size:0.58rem;color:{lcolor};font-weight:{fw};"
-                f"white-space:nowrap;overflow:hidden;text-overflow:ellipsis;'>{name}</div>"
+                f"<div style='font-size:0.6rem;color:{lcolor};font-weight:{fw};"
+                f"white-space:nowrap;'>{name}</div>"
                 f"</div>",
                 unsafe_allow_html=True
             )
@@ -445,7 +453,7 @@ def render_progress(current):
 # ─── Speaker Helper ───────────────────────────────────────────────────────────
 def dialogue(speaker, text, kind="joey"):
     """kind: joey | vl | thought"""
-    icon_map = {"joey": "user", "vl": "briefcase", "thought": "thought"}
+    fa_map = {"joey": "fa-user", "vl": "fa-briefcase", "thought": "fa-ellipsis"}
     av_cls = {"joey": "av-joey", "vl": "av-vl", "thought": "av-thought"}
     sn_cls = {"joey": "sn-joey", "vl": "sn-vl", "thought": "sn-thought"}
     txt_cls = "dialogue-thought" if kind == "thought" else "dialogue-text"
@@ -508,8 +516,48 @@ def make_charts(r):
 # STEPS
 # ═══════════════════════════════════════════════════════════════════════════════
 
+# ─── Navigation ───────────────────────────────────────────────────────────────
+def render_nav():
+    """Jump-to navigation between steps"""
+    current = st.session_state.get("step", 1)
+    nav_meta = [
+        ("fa-comments",    "Gespräch"),
+        ("fa-code-branch", "Dein Weg"),
+        ("fa-compass",     "Vorbereitung"),
+        ("fa-handshake",   "Follow-up"),
+        ("fa-calculator",  "Kalkulator"),
+        ("fa-chart-line",  "Ergebnis"),
+    ]
+    # Render nav as HTML with FA icons
+    nav_html = "<div style='display:flex;gap:0.4rem;margin-bottom:1rem;'>"
+    for i, (fa, label) in enumerate(nav_meta, 1):
+        is_cur = (i == st.session_state.get("step", 1))
+        bg  = "#1E2A5E" if is_cur else "white"
+        col = "white"  if is_cur else "#1E2A5E"
+        bdr = "none"   if is_cur else "1.5px solid #1E2A5E"
+        nav_html += (
+            f"<div style='flex:1;background:{bg};color:{col};border:{bdr};"
+            f"border-radius:8px;padding:0.4rem 0.3rem;text-align:center;"
+            f"font-size:0.75rem;font-weight:600;cursor:pointer;'>"
+            f"<i class='fa-solid {fa}'></i><br>"
+            f"<span style='font-size:0.6rem;'>{label}</span></div>"
+        )
+    nav_html += "</div>"
+    st.markdown(nav_html, unsafe_allow_html=True)
+
+    # Hidden Streamlit buttons for actual click handling
+    cols = st.columns(6)
+    for i, (col, (fa, label)) in enumerate(zip(cols, nav_meta), 1):
+        with col:
+            if st.button(label, key=f"nav_jump_{i}", use_container_width=True,
+                         help=f"Zu: {label}"):
+                st.session_state.step = i
+                st.rerun()
+
+
 def step1():
     render_progress(1)
+    render_nav()
     st.markdown('<div class="scene-header">Das Gespräch</div>', unsafe_allow_html=True)
     st.markdown("""
     <div class="scene-sub">
@@ -560,6 +608,7 @@ def step1():
 
 def step2():
     render_progress(2)
+    render_nav()
     st.markdown('<div class="scene-header">Joeys nächster Schritt</div>', unsafe_allow_html=True)
 
     st.markdown(dialogue("Joey — innerlich",
@@ -617,6 +666,7 @@ def step2():
 
 def step3():
     render_progress(3)
+    render_nav()
 
     if st.session_state.path == "swifty":
         st.markdown('<div class="scene-header">Vorbereitung mit Swifty</div>', unsafe_allow_html=True)
@@ -703,6 +753,7 @@ def step3():
 
 def step4():
     render_progress(4)
+    render_nav()
     st.markdown('<div class="scene-header">Das Follow-up</div>', unsafe_allow_html=True)
     st.markdown("""
     <div class="scene-sub">
@@ -753,6 +804,7 @@ def step4():
 
 def step5():
     render_progress(5)
+    render_nav()
     st.markdown('<div class="scene-header">Der Kalkulator</div>', unsafe_allow_html=True)
     st.markdown("""
     <div class="scene-sub">
@@ -1030,6 +1082,7 @@ def generate_pdf(r, p):
 
 def step6():
     render_progress(6)
+    render_nav()
     r = st.session_state.results
     p = st.session_state.params
 
