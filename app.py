@@ -719,7 +719,7 @@ def step3():
         # Status Quo research hints
         st.markdown(
             "<div style='background:#F3F2EE;border-radius:10px;border-left:3px solid #B8BCDE;"
-            "padding:0.9rem 1.1rem;margin-bottom:1.2rem;'>"
+            "padding:0.9rem 1.1rem;margin-bottom:0.8rem;'>"
             "<div style='font-weight:700;color:#1E2A5E;font-size:0.88rem;margin-bottom:0.5rem;'>"
             "🔍 Status Quo recherchieren — bevor du Zahlen sammelst</div>"
             "<div style='font-size:0.83rem;color:#6B7280;line-height:1.8;'>"
@@ -731,6 +731,25 @@ def step3():
             "Gibt es Branchenbenchmarks (z.B. 20-25% ist Branchendurchschnitt)?<br>"
             "👥 <strong>Teamdynamik:</strong> Letzte Mitarbeitergespräche, "
             "Feedbackrunden, bekannte Motivationsthemen"
+            "</div></div>",
+            unsafe_allow_html=True
+        )
+
+        # Finance tip
+        st.markdown(
+            "<div style='background:#EEF0F8;border-radius:10px;border-left:3px solid #1E2A5E;"
+            "padding:0.9rem 1.1rem;margin-bottom:1.2rem;'>"
+            "<div style='font-weight:700;color:#1E2A5E;font-size:0.88rem;margin-bottom:0.5rem;'>"
+            "💼 Mit Finance abstimmen — vor dem Follow-up</div>"
+            "<div style='font-size:0.83rem;color:#6B7280;line-height:1.8;'>"
+            "📊 <strong>Marge & Deal-Wert verifizieren:</strong> Finance kann die tatsächliche "
+            "Deckungsbeitragsmarge aus dem Controlling bestätigen — nicht nur eine Schätzung von Thomas.<br>"
+            "📈 <strong>Pipeline-Daten:</strong> CRM-Auswertung mit Abschlussquoten pro Quartal — "
+            "Finance oder Sales-Controlling hat diese Zahlen oft vorliegen.<br>"
+            "💰 <strong>Trainingsbudget klären:</strong> Wie groß ist das genehmigte Budget, "
+            "was fehlt, welche Genehmigungsstufe ist nötig?<br>"
+            "🔒 <strong>Vorabgespräch CFO:</strong> Vor dem formalen Business Case lohnt ein kurzer "
+            "informeller Check — 'Was braucht ihr, um das zu genehmigen?'"
             "</div></div>",
             unsafe_allow_html=True
         )
