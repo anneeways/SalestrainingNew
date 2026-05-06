@@ -325,22 +325,47 @@ class Params:
     margin_rate: float = 25.0
     training_days: int = 3
     daily_rate: float = 400.0
+    pilot_mode: bool = False  # Train-the-Trainer: cost for N, revenue for full team
 
 def calculate(p: Params):
     tc = p.participants * p.cost_per_person
     oc = p.participants * p.training_days * p.daily_rate
     total = tc + oc
     cd = p.monthly_leads * (p.current_rate / 100)
-    td = p.monthly_leads * (p.target_rate / 100)
-    ad = td - cd
+    td_full = p.monthly_leads * (p.target_rate / 100)
+
+    if p.pilot_mode:
+        # Phase 1 (Months 1-6): only pilot participants at target rate
+        pilot_share = p.participants / 10  # fraction of team trained
+        td_phase1 = (p.monthly_leads * pilot_share * (p.target_rate / 100) +
+                     p.monthly_leads * (1 - pilot_share) * (p.current_rate / 100))
+        ad_phase1 = td_phase1 - cd
+        mm_phase1 = ad_phase1 * p.deal_value * (p.margin_rate / 100)
+
+        # Phase 2 (Months 7-12): full team at target rate
+        ad_phase2 = td_full - cd
+        mm_phase2 = ad_phase2 * p.deal_value * (p.margin_rate / 100)
+
+        am = mm_phase1 * 6 + mm_phase2 * 6  # blended annual margin
+        ad = (ad_phase1 + ad_phase2) / 2     # avg for display
+        mm = am / 12                          # avg monthly for payback
+        td = td_phase1                        # display phase 1 target
+    else:
+        td = td_full
+        ad = td - cd
+        mr = ad * p.deal_value
+        mm = mr * (p.margin_rate / 100)
+        am = mm * 12
+
     mr = ad * p.deal_value
-    mm = mr * (p.margin_rate / 100)
-    am = mm * 12
     net = am - total
     roi = (net / total) * 100 if total > 0 else 0
     pb = (total / mm) if mm > 0 else 0
     return dict(total=total, tc=tc, oc=oc, cd=cd, td=td, ad=ad,
-                mr=mr, mm=mm, am=am, net=net, roi=roi, pb=pb)
+                mr=mr, mm=mm, am=am, net=net, roi=roi, pb=pb,
+                pilot_mode=p.pilot_mode,
+                mm_phase1=mm_phase1 if p.pilot_mode else mm,
+                mm_phase2=mm_phase2 if p.pilot_mode else mm)
 
 def fmt(v): return f"{v:,.0f} €".replace(",", ".")
 
@@ -1187,7 +1212,9 @@ def step6():
         deal_val      = st.number_input("Ø Deal-Wert (€)", 1000, 500000, lp.get("deal_value", 15000), 500)
         margin        = st.slider("Marge pro Deal (%)", 5.0, 80.0, float(lp.get("margin_rate", 25.0)), 1.0)
 
-    p = Params(participants, cost_pp, leads, curr_rate, tgt_rate, deal_val, margin, t_days, daily_rate)
+    is_pilot_mode = "Pilot" in st.session_state.get("recommendation", "")
+    p = Params(participants, cost_pp, leads, curr_rate, tgt_rate, deal_val, margin,
+               t_days, daily_rate, pilot_mode=is_pilot_mode)
     r = calculate(p)
     st.session_state.params = p
     st.session_state.results = r
@@ -1201,6 +1228,23 @@ def step6():
         ("fa-percent",          "ROI",               f"{r['roi']:.0f}%",   fmt(r["net"]) + " Nettogewinn"),
         ("fa-rotate-left",   "Payback",           f"{r['pb']:.1f} Mon.", "bis Break-even"),
     ]
+
+    # Pilot mode explanation
+    if p.pilot_mode:
+        mm1 = r.get("mm_phase1", r["mm"])
+        mm2 = r.get("mm_phase2", r["mm"])
+        st.markdown(
+            "<div style='background:#EFF6FF;border-left:4px solid #3B82F6;border-radius:8px;"
+            "padding:0.9rem 1.1rem;margin-bottom:0.8rem;font-size:0.87rem;color:#1E2A5E;'>"
+            "<strong>🚀 Train-the-Trainer — Phasenmodell:</strong><br>"
+            f"<strong>Phase 1 (Monat 1–6):</strong> Nur {participants} Top-Performer trainiert "
+            f"→ Zusatzgewinn <strong>{fmt(mm1)}/Monat</strong><br>"
+            f"<strong>Phase 2 (Monat 7–12):</strong> Internes Training, gesamtes Team auf {tgt_rate}% "
+            f"→ Zusatzgewinn <strong>{fmt(mm2)}/Monat</strong><br>"
+            f"<strong>Jahresgewinn gesamt (gewichtet): {fmt(r['am'])}</strong>"
+            "</div>",
+            unsafe_allow_html=True
+        )
 
     kpi_html = '<div class="kpi-grid">'
     for kpi_icon, label, value, sub in kpis:
