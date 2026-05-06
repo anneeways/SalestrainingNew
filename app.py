@@ -767,7 +767,6 @@ def step3():
                 with col_text:
                     st.markdown(f"**{title}**")
                     st.caption(detail)
-            st.divider()
 
         st.markdown("<br>", unsafe_allow_html=True)
         if st.button("Weiter zum Follow-up-Gespräch  →"):
@@ -1186,7 +1185,6 @@ def step6():
             with col_t:
                 st.markdown(f"**{title}**")
                 st.caption(text)
-            st.divider()
 
     with col2:
         st.markdown("**⚙️&nbsp; Szenarien im Vergleich**",
