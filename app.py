@@ -726,16 +726,21 @@ def step3():
         ]
 
         for item_icon, title, detail in items:
-            st.markdown(f"""
-            <div class="check-item">
-                <div class="check-icon-wrap">
-                    
-                </div>
-                <div>
-                    <strong style="color:#1E2A5E;">{title}</strong><br>
-                    <span style="color:#6B7280; font-size:0.87rem;">{detail}</span>
-                </div>
-            </div>""", unsafe_allow_html=True)
+            with st.container():
+                col_icon, col_text = st.columns([0.08, 0.92])
+                with col_icon:
+                    st.markdown(
+                        f"<div style='width:28px;height:28px;border-radius:50%;"
+                        f"background:#D1FAE5;display:flex;align-items:center;"
+                        f"justify-content:center;margin-top:2px;'>"
+                        f"<i class='fa-solid {item_icon}' style='font-size:0.65rem;color:#059669;'></i>"
+                        f"</div>",
+                        unsafe_allow_html=True
+                    )
+                with col_text:
+                    st.markdown(f"**{title}**")
+                    st.caption(detail)
+            st.divider()
 
         st.markdown("<br>", unsafe_allow_html=True)
         if st.button("Weiter zum Follow-up-Gespräch  →"):
