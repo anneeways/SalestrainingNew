@@ -791,211 +791,275 @@ def step5():
         st.rerun()
 
 
+
 # ─── PDF Generator ────────────────────────────────────────────────────────────
 def generate_pdf(r, p):
+    from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, HRFlowable, KeepTogether
+    from reportlab.lib.pagesizes import A4
+    from reportlab.lib import colors
+    from reportlab.lib.units import mm
+    from reportlab.lib.styles import ParagraphStyle
+    from reportlab.lib.enums import TA_LEFT, TA_CENTER, TA_RIGHT
+    from io import BytesIO
+
     buf = BytesIO()
     doc = SimpleDocTemplate(buf, pagesize=A4,
-                            leftMargin=18*mm, rightMargin=18*mm,
-                            topMargin=16*mm, bottomMargin=16*mm)
+                            leftMargin=16*mm, rightMargin=16*mm,
+                            topMargin=14*mm, bottomMargin=14*mm)
 
-    NAVY   = colors.HexColor("#1E2A5E")
-    LAV    = colors.HexColor("#B8BCDE")
-    CREAM  = colors.HexColor("#F5F0E6")
-    GRAY   = colors.HexColor("#6B7280")
-    GREEN  = colors.HexColor("#059669")
-    WHITE  = colors.white
+    NAVY  = colors.HexColor("#1E2A5E")
+    LAV   = colors.HexColor("#B8BCDE")
+    CREAM = colors.HexColor("#F5F0E6")
+    GRAY  = colors.HexColor("#6B7280")
+    GREEN = colors.HexColor("#059669")
+    LGRAY = colors.HexColor("#F3F2EE")
+    WHITE = colors.white
 
-    def sty(name, **kw):
-        base = ParagraphStyle(name, **kw)
-        return base
+    def s(name, **kw):
+        return ParagraphStyle(name, **kw)
 
-    s_header   = sty("header",   fontSize=22, textColor=NAVY,  leading=28, fontName="Helvetica-Bold")
-    s_sub      = sty("sub",      fontSize=8,  textColor=GRAY,  leading=12, fontName="Helvetica", spaceAfter=6)
-    s_section  = sty("section",  fontSize=11, textColor=NAVY,  leading=16, fontName="Helvetica-Bold", spaceBefore=10, spaceAfter=4)
-    s_body     = sty("body",     fontSize=9,  textColor=NAVY,  leading=14, fontName="Helvetica")
-    s_bodygray = sty("bodygray", fontSize=8,  textColor=GRAY,  leading=12, fontName="Helvetica")
-    s_kpi_val  = sty("kpival",   fontSize=18, textColor=WHITE, leading=22, fontName="Helvetica-Bold", alignment=TA_CENTER)
-    s_kpi_lbl  = sty("kpilbl",   fontSize=7,  textColor=LAV,   leading=10, fontName="Helvetica",      alignment=TA_CENTER)
-    s_footer   = sty("footer",   fontSize=7,  textColor=GRAY,  leading=10, fontName="Helvetica",      alignment=TA_CENTER)
-    s_arg_ttl  = sty("argttl",   fontSize=9,  textColor=NAVY,  leading=13, fontName="Helvetica-Bold")
-    s_arg_body = sty("argbody",  fontSize=8,  textColor=GRAY,  leading=12, fontName="Helvetica")
+    # Styles
+    sh  = s("h",  fontSize=20, textColor=WHITE,  leading=26, fontName="Helvetica-Bold")
+    shs = s("hs", fontSize=8,  textColor=LAV,    leading=12, fontName="Helvetica", spaceAfter=2)
+    ss  = s("s",  fontSize=9,  textColor=WHITE,  leading=14, fontName="Helvetica-Bold", alignment=TA_CENTER)
+    sv  = s("v",  fontSize=20, textColor=WHITE,  leading=26, fontName="Helvetica-Bold", alignment=TA_CENTER)
+    sl  = s("l",  fontSize=7,  textColor=LAV,    leading=10, fontName="Helvetica",      alignment=TA_CENTER)
+    sec = s("sec",fontSize=10, textColor=WHITE,  leading=14, fontName="Helvetica-Bold")
+    sb  = s("sb", fontSize=8,  textColor=NAVY,   leading=13, fontName="Helvetica")
+    sbg = s("sbg",fontSize=8,  textColor=GRAY,   leading=12, fontName="Helvetica")
+    sbw = s("sbw",fontSize=8,  textColor=WHITE,  leading=13, fontName="Helvetica")
+    sbwb= s("sbwb",fontSize=8, textColor=WHITE,  leading=13, fontName="Helvetica-Bold")
+    sft = s("ft", fontSize=7,  textColor=GRAY,   leading=10, fontName="Helvetica", alignment=TA_CENTER)
+    sat = s("sat",fontSize=8,  textColor=NAVY,   leading=12, fontName="Helvetica-Bold")
 
     story = []
+    W = 174*mm  # usable width
 
-    # ── Header ──
-    story.append(Paragraph("HR loves Finance", s_header))
-    story.append(Paragraph(
-        f"Joey's Business Case &nbsp;·&nbsp; Sales Training ROI &nbsp;·&nbsp; {datetime.now().strftime('%d.%m.%Y')}",
-        s_sub))
-    story.append(HRFlowable(width="100%", thickness=1.5, color=NAVY, spaceAfter=10))
-
-    # ── KPI Table ──
-    story.append(Paragraph("Kern-Ergebnisse", s_section))
-
-    kpi_data = [
-        [Paragraph("GESAMTINVESTITION", s_kpi_lbl),
-         Paragraph("ZUSATZGEWINN/MONAT", s_kpi_lbl),
-         Paragraph("JAHRESGEWINN", s_kpi_lbl),
-         Paragraph("ROI", s_kpi_lbl),
-         Paragraph("PAYBACK", s_kpi_lbl)],
-        [Paragraph(fmt(r["total"]),  s_kpi_val),
-         Paragraph(fmt(r["mm"]),     s_kpi_val),
-         Paragraph(fmt(r["am"]),     s_kpi_val),
-         Paragraph(f"{r['roi']:.0f}%", s_kpi_val),
-         Paragraph(f"{r['pb']:.1f} Mon.", s_kpi_val)],
-    ]
-    kpi_table = Table(kpi_data, colWidths=[34*mm]*5)
-    kpi_table.setStyle(TableStyle([
-        ("BACKGROUND",  (0,0), (-1,-1), NAVY),
-        ("ROWBACKGROUNDS", (0,0), (-1,-1), [NAVY, NAVY]),
-        ("TOPPADDING",  (0,0), (-1,-1), 6),
-        ("BOTTOMPADDING",(0,0),(-1,-1), 6),
-        ("LEFTPADDING", (0,0), (-1,-1), 3),
-        ("RIGHTPADDING",(0,0), (-1,-1), 3),
-        ("INNERGRID",   (0,0), (-1,-1), 0.5, colors.HexColor("#2E3D6E")),
-        ("BOX",         (0,0), (-1,-1), 0,   NAVY),
-        ("ROUNDEDCORNERS", [4], None, None),
+    # ── HEADER NAVY BOX ──────────────────────────────────────────────────────
+    hdr = Table(
+        [[Paragraph("HR loves Finance", sh)],
+         [Paragraph(f"Joey's Business Case &nbsp;·&nbsp; Sales Training ROI &nbsp;·&nbsp; {datetime.now().strftime('%d.%m.%Y')}", shs)]],
+        colWidths=[W]
+    )
+    hdr.setStyle(TableStyle([
+        ("BACKGROUND",    (0,0), (-1,-1), NAVY),
+        ("TOPPADDING",    (0,0), (-1,-1), 10),
+        ("BOTTOMPADDING", (0,0), (-1,-1), 6),
+        ("LEFTPADDING",   (0,0), (-1,-1), 12),
+        ("RIGHTPADDING",  (0,0), (-1,-1), 12),
     ]))
-    story.append(kpi_table)
-    story.append(Spacer(1, 8))
+    story.append(hdr)
+    story.append(Spacer(1, 6))
 
-    # ── Calculation ──
-    story.append(Paragraph("Kalkulation im Detail", s_section))
-    calc_data = [
-        ["Parameter", "Berechnung", "Ergebnis"],
-        ["Trainingskosten",
-         f"{p.participants} Teilnehmer x {fmt(p.cost_per_person)}",
-         fmt(r["tc"])],
-        ["Ausfallkosten",
-         f"{p.participants} x {p.training_days} Tage x {p.daily_rate:.0f} EUR",
-         fmt(r["oc"])],
-        ["Gesamtinvestition", "", fmt(r["total"])],
-        ["Zusaetzliche Deals/Monat",
-         f"{p.monthly_leads} Leads x ({p.target_rate}% - {p.current_rate}%)",
-         f"{r['ad']:.1f} Deals"],
-        ["Mehrumsatz/Monat",
-         f"{r['ad']:.1f} Deals x {fmt(p.deal_value)}",
-         fmt(r["mr"])],
-        ["Zusatzgewinn/Monat",
-         f"{fmt(r['mr'])} x {p.margin_rate}%",
-         fmt(r["mm"])],
-        ["Jahresgewinn", "x 12 Monate", fmt(r["am"])],
-        ["ROI",
-         f"({fmt(r['net'])} / {fmt(r['total'])}) x 100",
-         f"{r['roi']:.0f}%"],
-        ["Payback",
-         f"{fmt(r['total'])} / {fmt(r['mm'])}",
-         f"{r['pb']:.1f} Monate"],
+    # ── KPI ROW (5 navy boxes) ────────────────────────────────────────────────
+    kpi_w = W / 5
+    kpis = [
+        ("GESAMTINVESTITION", fmt(r["total"]),      "Training + Ausfall"),
+        ("ZUSATZGEWINN/MON.", fmt(r["mm"]),          f"+{r['ad']:.1f} Deals x {p.margin_rate}%"),
+        ("JAHRESGEWINN",      fmt(r["am"]),          "nach 12 Monaten"),
+        ("ROI",               f"{r['roi']:.0f}%", fmt(r["net"]) + " Nettogewinn"),
+        ("PAYBACK",           f"{r['pb']:.1f} Mon.","bis Break-even"),
     ]
-    styled_calc = []
-    for row in calc_data:
-        styled_calc.append([
-            Paragraph(str(row[0]), s_body),
-            Paragraph(str(row[1]), s_bodygray),
-            Paragraph(str(row[2]), s_body),
-        ])
-
-    calc_table = Table(styled_calc, colWidths=[50*mm, 80*mm, 40*mm])
-    calc_table.setStyle(TableStyle([
-        ("BACKGROUND",   (0,0), (-1,0),  LAV),
-        ("TEXTCOLOR",    (0,0), (-1,0),  NAVY),
-        ("FONTNAME",     (0,0), (-1,0),  "Helvetica-Bold"),
-        ("FONTSIZE",     (0,0), (-1,0),  8),
-        ("ROWBACKGROUNDS",(0,1),(-1,-1), [WHITE, colors.HexColor("#F9F8F5")]),
-        ("BACKGROUND",   (0,3), (-1,3),  colors.HexColor("#EEF0F8")),
-        ("BACKGROUND",   (0,7), (-1,7),  colors.HexColor("#EEF0F8")),
-        ("FONTNAME",     (2,3), (2,3),   "Helvetica-Bold"),
-        ("FONTNAME",     (2,7), (2,7),   "Helvetica-Bold"),
-        ("FONTNAME",     (2,8), (2,8),   "Helvetica-Bold"),
-        ("FONTNAME",     (2,9), (2,9),   "Helvetica-Bold"),
-        ("TOPPADDING",   (0,0), (-1,-1), 5),
-        ("BOTTOMPADDING",(0,0), (-1,-1), 5),
-        ("LEFTPADDING",  (0,0), (-1,-1), 6),
-        ("RIGHTPADDING", (0,0), (-1,-1), 6),
-        ("GRID",         (0,0), (-1,-1), 0.4, colors.HexColor("#E5E1D8")),
-        ("BOX",          (0,0), (-1,-1), 1,   LAV),
-    ]))
-    story.append(calc_table)
-    story.append(Spacer(1, 8))
-
-    # ── Arguments ──
-    story.append(Paragraph("Top-Argumente fuer CFO und CEO", s_section))
-    args = [
-        ("Gewinn, nicht Umsatz",
-         f"Das Training generiert {fmt(r['am'])} zusaetzlichen Jahresgewinn — echter Deckungsbeitrag."),
-        ("Schnelle Amortisation",
-         f"Payback in {r['pb']:.1f} Monaten — schneller als jede Software-Einfuehrung."),
-        ("Opportunitaetskosten des Abwartens",
-         f"Jeder Monat ohne Training kostet {fmt(r['mm'])} entgangenen Gewinn."),
-        ("Begrenzter Downside",
-         f"Selbst bei nur 20% Abschlussquote bleibt der ROI positiv."),
-        ("Referenzen statt Versprechen",
-         "Zwei Kunden des Anbieters haben 22-28% erreicht — Marktdaten, kein Pitch."),
-    ]
-    arg_data = []
-    for title, text in args:
-        arg_data.append([
-            Paragraph(title, s_arg_ttl),
-            Paragraph(text, s_arg_body)
-        ])
-    arg_table = Table(arg_data, colWidths=[50*mm, 120*mm])
-    arg_table.setStyle(TableStyle([
-        ("ROWBACKGROUNDS", (0,0), (-1,-1), [WHITE, colors.HexColor("#F9F8F5")]),
+    kpi_row1 = [Paragraph(k[0], sl) for k in kpis]
+    kpi_row2 = [Paragraph(k[1], sv) for k in kpis]
+    kpi_row3 = [Paragraph(k[2], sl) for k in kpis]
+    kpi_tbl = Table([kpi_row1, kpi_row2, kpi_row3], colWidths=[kpi_w]*5)
+    kpi_tbl.setStyle(TableStyle([
+        ("BACKGROUND",    (0,0), (-1,-1), NAVY),
         ("TOPPADDING",    (0,0), (-1,-1), 5),
         ("BOTTOMPADDING", (0,0), (-1,-1), 5),
-        ("LEFTPADDING",   (0,0), (-1,-1), 6),
+        ("LEFTPADDING",   (0,0), (-1,-1), 2),
+        ("RIGHTPADDING",  (0,0), (-1,-1), 2),
+        ("LINEAFTER",     (0,0), (3,2),   0.5, colors.HexColor("#2E3D6E")),
+        ("BOX",           (0,0), (-1,-1), 0,   NAVY),
+    ]))
+    story.append(kpi_tbl)
+    story.append(Spacer(1, 7))
+
+    # ── KALKULATION ───────────────────────────────────────────────────────────
+    # Section header (navy)
+    def navy_header(text):
+        t = Table([[Paragraph(text, sec)]], colWidths=[W])
+        t.setStyle(TableStyle([
+            ("BACKGROUND",    (0,0), (-1,-1), NAVY),
+            ("TOPPADDING",    (0,0), (-1,-1), 5),
+            ("BOTTOMPADDING", (0,0), (-1,-1), 5),
+            ("LEFTPADDING",   (0,0), (-1,-1), 10),
+            ("RIGHTPADDING",  (0,0), (-1,-1), 10),
+        ]))
+        return t
+
+    story.append(navy_header("Kalkulation im Detail"))
+    story.append(Spacer(1, 1))
+
+    calc_rows = [
+        # (label, formula, result, bold, navy_bg)
+        ("Trainingskosten",
+         f"{p.participants} Teilnehmer x {fmt(p.cost_per_person)}",
+         fmt(r["tc"]), False, False),
+        ("Ausfallkosten",
+         f"{p.participants} x {p.training_days} Tage x {p.daily_rate:.0f} EUR",
+         fmt(r["oc"]), False, False),
+        ("Gesamtinvestition", "Summe beider Positionen",
+         fmt(r["total"]), True, True),
+        ("Zusat. Deals/Monat",
+         f"{p.monthly_leads} Leads x ({p.target_rate}% - {p.current_rate}%)",
+         f"{r['ad']:.1f} Deals", False, False),
+        ("Mehrumsatz/Monat",
+         f"{r['ad']:.1f} x {fmt(p.deal_value)}",
+         fmt(r["mr"]), False, False),
+        ("Zusatzgewinn/Monat",
+         f"{fmt(r['mr'])} x {p.margin_rate}%",
+         fmt(r["mm"]), False, False),
+        ("Jahresgewinn",      "x 12 Monate",
+         fmt(r["am"]), True, True),
+        ("ROI",
+         f"({fmt(r['net'])} / {fmt(r['total'])}) x 100",
+         f"{r['roi']:.0f}%", True, True),
+        ("Payback",
+         f"{fmt(r['total'])} / {fmt(r['mm'])}",
+         f"{r['pb']:.1f} Monate", True, True),
+    ]
+
+    table_data = []
+    row_styles = []
+    navy_rows = []
+    for i, (lbl, formula, result, bold, navy_bg) in enumerate(calc_rows):
+        if navy_bg:
+            ls = sbwb if bold else sbw
+            fs = sbw
+            navy_rows.append(i)
+        else:
+            ls = sat if bold else sb
+            fs = sbg
+        table_data.append([
+            Paragraph(lbl, ls),
+            Paragraph(formula, fs if not navy_bg else sbw),
+            Paragraph(result, ls),
+        ])
+
+    calc_tbl = Table(table_data, colWidths=[45*mm, 90*mm, 39*mm])
+    ts = [
+        ("ROWBACKGROUNDS", (0,0), (-1,-1), [WHITE, LGRAY]),
+        ("TOPPADDING",    (0,0), (-1,-1), 4),
+        ("BOTTOMPADDING", (0,0), (-1,-1), 4),
+        ("LEFTPADDING",   (0,0), (-1,-1), 7),
+        ("RIGHTPADDING",  (0,0), (-1,-1), 7),
+        ("GRID",          (0,0), (-1,-1), 0.3, colors.HexColor("#DDD9D0")),
+        ("BOX",           (0,0), (-1,-1), 1,   LAV),
+        ("VALIGN",        (0,0), (-1,-1), "MIDDLE"),
+    ]
+    for ri in navy_rows:
+        ts.append(("BACKGROUND", (0,ri), (-1,ri), NAVY))
+    calc_tbl.setStyle(TableStyle(ts))
+    story.append(calc_tbl)
+    story.append(Spacer(1, 7))
+
+    # ── ARGUMENTE & SZENARIEN SIDE BY SIDE ───────────────────────────────────
+    # Arguments
+    arg_header = Table([[Paragraph("Top-Argumente fuer CFO + CEO", sec)]], colWidths=[90*mm])
+    arg_header.setStyle(TableStyle([
+        ("BACKGROUND",    (0,0), (-1,-1), NAVY),
+        ("TOPPADDING",    (0,0), (-1,-1), 5),
+        ("BOTTOMPADDING", (0,0), (-1,-1), 5),
+        ("LEFTPADDING",   (0,0), (-1,-1), 10),
+    ]))
+
+    args = [
+        ("Gewinn, nicht Umsatz",
+         f"{fmt(r['am'])} Jahresgewinn — kein Umsatzversprechen."),
+        ("Schnelle Amortisation",
+         f"Payback in {r['pb']:.1f} Monaten."),
+        ("Opportunitaetskosten",
+         f"Jeder Monat kostet {fmt(r['mm'])} entgangenen Gewinn."),
+        ("Begrenzter Downside",
+         "Selbst bei 20% bleibt ROI positiv."),
+        ("Referenzen",
+         "Kunden erreichten 22-28% — Marktdaten."),
+    ]
+    arg_rows = []
+    for title, txt in args:
+        arg_rows.append([Paragraph(f"<b>{title}</b><br/>{txt}", sb)])
+    arg_tbl = Table(arg_rows, colWidths=[90*mm])
+    arg_tbl.setStyle(TableStyle([
+        ("ROWBACKGROUNDS", (0,0), (-1,-1), [WHITE, LGRAY]),
+        ("TOPPADDING",    (0,0), (-1,-1), 5),
+        ("BOTTOMPADDING", (0,0), (-1,-1), 5),
+        ("LEFTPADDING",   (0,0), (-1,-1), 10),
         ("RIGHTPADDING",  (0,0), (-1,-1), 6),
-        ("GRID",          (0,0), (-1,-1), 0.4, colors.HexColor("#E5E1D8")),
+        ("GRID",          (0,0), (-1,-1), 0.3, colors.HexColor("#DDD9D0")),
         ("BOX",           (0,0), (-1,-1), 1,   LAV),
         ("VALIGN",        (0,0), (-1,-1), "TOP"),
     ]))
-    story.append(arg_table)
-    story.append(Spacer(1, 8))
 
-    # ── Scenarios ──
-    story.append(Paragraph("Szenarien im Vergleich", s_section))
+    # Scenarios
+    sc_header = Table([[Paragraph("Szenarien im Vergleich", sec)]], colWidths=[80*mm])
+    sc_header.setStyle(TableStyle([
+        ("BACKGROUND",    (0,0), (-1,-1), NAVY),
+        ("TOPPADDING",    (0,0), (-1,-1), 5),
+        ("BOTTOMPADDING", (0,0), (-1,-1), 5),
+        ("LEFTPADDING",   (0,0), (-1,-1), 10),
+    ]))
+
     cons_ad = p.monthly_leads * 0.20 - (p.monthly_leads * p.current_rate / 100)
     cons_am = cons_ad * p.deal_value * (p.margin_rate / 100) * 12
     cons_roi = ((cons_am - r["total"]) / r["total"]) * 100
+    opt_am = r["am"] * 1.25
+    opt_roi = (opt_am - r["total"]) / r["total"] * 100
 
     sc_data = [
-        [Paragraph("Szenario", s_body), Paragraph("Abschlussquote", s_body),
-         Paragraph("Jahresgewinn", s_body), Paragraph("ROI", s_body)],
-        [Paragraph("Konservativ", s_body), Paragraph("20%", s_bodygray),
-         Paragraph(fmt(cons_am), s_body), Paragraph(f"{cons_roi:.0f}%", s_body)],
-        [Paragraph("Realistisch", s_body), Paragraph(f"{p.target_rate}%", s_bodygray),
-         Paragraph(fmt(r["am"]), s_body), Paragraph(f"{r['roi']:.0f}%", s_body)],
-        [Paragraph("Optimistisch", s_body), Paragraph("+25% ueber Ziel", s_bodygray),
-         Paragraph(fmt(r["am"]*1.25), s_body),
-         Paragraph(f"{((r['am']*1.25 - r['total'])/r['total']*100):.0f}%", s_body)],
+        [Paragraph("<b>Szenario</b>", sbw),
+         Paragraph("<b>Jahresgewinn</b>", sbw),
+         Paragraph("<b>ROI</b>", sbw)],
+        [Paragraph("Konservativ (20%)", sb),
+         Paragraph(fmt(cons_am), sb),
+         Paragraph(f"{cons_roi:.0f}%", sb)],
+        [Paragraph("<b>Realistisch (25%)</b>", sat),
+         Paragraph(f"<b>{fmt(r['am'])}</b>", sat),
+         Paragraph(f"<b>{r['roi']:.0f}%</b>", sat)],
+        [Paragraph("Optimistisch (+25%)", sb),
+         Paragraph(fmt(opt_am), sb),
+         Paragraph(f"{opt_roi:.0f}%", sb)],
     ]
-    sc_table = Table(sc_data, colWidths=[40*mm, 40*mm, 55*mm, 35*mm])
-    sc_table.setStyle(TableStyle([
-        ("BACKGROUND",    (0,0), (-1,0),  LAV),
-        ("FONTNAME",      (0,0), (-1,0),  "Helvetica-Bold"),
-        ("FONTSIZE",      (0,0), (-1,0),  8),
-        ("ROWBACKGROUNDS",(0,1),(-1,-1),  [WHITE, colors.HexColor("#F9F8F5")]),
-        ("BACKGROUND",    (0,2), (-1,2),  colors.HexColor("#D1FAE5")),
+    sc_tbl = Table(sc_data, colWidths=[32*mm, 28*mm, 20*mm])
+    sc_tbl.setStyle(TableStyle([
+        ("BACKGROUND",    (0,0), (-1,0), NAVY),
+        ("ROWBACKGROUNDS",(0,1),(-1,-1), [WHITE, colors.HexColor("#D1FAE5"), LGRAY]),
         ("TOPPADDING",    (0,0), (-1,-1), 5),
         ("BOTTOMPADDING", (0,0), (-1,-1), 5),
-        ("LEFTPADDING",   (0,0), (-1,-1), 6),
+        ("LEFTPADDING",   (0,0), (-1,-1), 8),
         ("RIGHTPADDING",  (0,0), (-1,-1), 6),
-        ("GRID",          (0,0), (-1,-1), 0.4, colors.HexColor("#E5E1D8")),
+        ("GRID",          (0,0), (-1,-1), 0.3, colors.HexColor("#DDD9D0")),
         ("BOX",           (0,0), (-1,-1), 1,   LAV),
+        ("FONTNAME",      (0,2), (-1,2), "Helvetica-Bold"),
+        ("VALIGN",        (0,0), (-1,-1), "MIDDLE"),
     ]))
-    story.append(sc_table)
 
-    # ── Footer ──
-    story.append(Spacer(1, 12))
-    story.append(HRFlowable(width="100%", thickness=0.5, color=LAV, spaceAfter=6))
+    # Side-by-side layout
+    combined = Table(
+        [[arg_header, Spacer(4,1), sc_header],
+         [arg_tbl,    Spacer(4,1), sc_tbl]],
+        colWidths=[90*mm, 4*mm, 80*mm]
+    )
+    combined.setStyle(TableStyle([
+        ("VALIGN",      (0,0), (-1,-1), "TOP"),
+        ("TOPPADDING",  (0,0), (-1,-1), 0),
+        ("BOTTOMPADDING",(0,0),(-1,-1), 0),
+        ("LEFTPADDING", (0,0), (-1,-1), 0),
+        ("RIGHTPADDING",(0,0), (-1,-1), 0),
+    ]))
+    story.append(combined)
+
+    # ── FOOTER ────────────────────────────────────────────────────────────────
+    story.append(Spacer(1, 10))
+    story.append(HRFlowable(width="100%", thickness=0.5, color=LAV, spaceAfter=5))
     story.append(Paragraph(
         "HR loves Finance  ·  Anne Schuster Consulting  ·  anneschuster.com  ·  CIMA Fellow (FCMA, CGMA)",
-        s_footer))
+        sft))
 
     doc.build(story)
     buf.seek(0)
     return buf.read()
-
 
 
 def step6():
