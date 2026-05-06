@@ -872,42 +872,81 @@ def step4():
 
     st.markdown("""
     <div style="background:#F3F2EE;border-radius:10px;border-left:3px solid #B8BCDE;
-                padding:1rem 1.3rem;margin-bottom:0.9rem;">
+                padding:1rem 1.3rem;margin-bottom:0.5rem;">
         <span style="font-size:0.85rem;color:#9CA3AF;font-style:italic;line-height:1.7;">
-            🎬 &nbsp;Joey hat Thomas zu sich gebeten. Sie hat einen Notizblock vor sich —
-            keine Zahlen, nur Fragen. Genau so, wie es sein sollte.
+            🎬 &nbsp;Joey hat Thomas zu sich gebeten. Vor ihr liegt ihre ausgefüllte Checkliste —
+            die gesammelten Informationen aus der Vorbereitung und die offenen Fragen,
+            die sie noch klären muss. Sie startet nicht mit Zahlen, sondern mit den Menschen.
         </span>
     </div>""", unsafe_allow_html=True)
 
+    st.markdown("""
+    <div style="background:#EEF0F8;border-radius:8px;padding:0.6rem 1rem;
+                margin-bottom:1rem;font-size:0.8rem;color:#6B7280;
+                border:1px dashed #B8BCDE;">
+        💡 <em>Dieses Gespräch ist <strong>beispielhaft</strong> und zeigt eine mögliche Gesprächsführung.
+        In der Praxis wird jedes Follow-up anders verlaufen — je nach Unternehmen, Team und Kontext.
+        Erweiterbar mit eigenen Fragen aus der Checkliste.</em>
+    </div>""", unsafe_allow_html=True)
+
     exchanges = [
+        # 1. Einstieg
         ("joey", "Joey",
-         "Thomas, bevor ich das intern weitertrage, brauche ich ein paar Zahlen von dir. "
-         "Ich will sichergehen, dass wir das wirklich durchgerechnet haben — "
-         "nicht nur das Versprechen des Anbieters."),
-        ("vl", "Thomas", "Klar, frag mich alles."),
-        ("joey", "Joey", "Wie viele Leads habt ihr aktuell pro Monat?"),
-        ("vl", "Thomas", "Ungefähr 200. Manchmal mehr, selten weniger."),
-        ("joey", "Joey", "Und der durchschnittliche Deal-Wert — wenn ein Lead abschließt?"),
-        ("vl", "Thomas", "15.000 €. Kann variieren, aber das ist ein realistischer Durchschnitt."),
-        ("joey", "Joey", "Was ist eure Marge auf so einen Deal?"),
-        ("vl", "Thomas", "Etwa 25%. Nach Kosten, versteht sich."),
-        ("joey", "Joey", "Und ihr seid aktuell wirklich bei 15% Abschlussquote?"),
-        ("vl", "Thomas", "Leider ja. War mal besser. Deshalb brauchen wir das Training."),
+         "Thomas, ich freue mich dass wir uns Zeit nehmen. Bevor wir über das Training reden — "
+         "ich möchte zuerst ein paar grundlegendere Fragen stellen. Nicht als Kritik, "
+         "aber ich muss sicher sein dass wir das richtige Problem lösen."),
+        ("vl", "Thomas", "Klar — frag alles was du brauchst."),
+
+        # 2. People first
         ("joey", "Joey",
-         "Letzte Frage: Woher weiß ich, dass 25% realistisch ist — und kein Anbieterversprechen?"),
+         "Wie lange stagniert die Abschlussquote schon bei 15%? War das mal besser — und wenn ja, was hat sich verändert?"),
         ("vl", "Thomas",
-         "Wir haben zwei Referenzkunden bekommen. Beide haben nach dem Training zwischen 22 und 28% "
-         "erreicht. Ich kann dir die Kontakte geben."),
-        ("joey",    "Joey",
-         "Thomas, noch eine wichtigere Frage: Sind wir sicher, dass wir die richtigen Leute im Team haben? Training bringt wenig, wenn das Problem woanders liegt."),
-        ("vl",      "Thomas",
-         "Gute Frage. Zwei Leute machen mir Sorgen — die kommen schon lange nicht mehr auf ihre Ziele. Aber drei andere haben wirklich Potenzial."),
-        ("joey",    "Joey",
-         "Und wie führst du das Team gerade? Gibt es klare Erwartungen, regelmäßiges Feedback — oder läuft vieles informal?"),
-        ("vl",      "Thomas",
-         "Ehrlich gesagt... könnten wir da besser sein. Ich bin viel im Kundenkontakt selbst."),
+         "Vor zwei Jahren lagen wir noch bei 20%. Seitdem drei Neuzugänge im Team, "
+         "der Markt ist wettbewerbsintensiver geworden."),
+        ("joey", "Joey",
+         "Wie hoch war eure Fluktuation im Sales-Team in den letzten 12 Monaten?"),
+        ("vl", "Thomas",
+         "Zwei Leute haben uns verlassen — einer davon war ein Top-Performer. Das hat uns zurückgeworfen."),
+        ("joey", "Joey",
+         "Habt ihr zuletzt eine Mitarbeiterbefragung oder Feedback-Gespräche geführt? "
+         "Wie ist die Stimmung — und weiß das Team klar was von ihnen erwartet wird?"),
+        ("vl", "Thomas",
+         "Letztes Jahr gab es eine kurze Umfrage. Engagement war okay, aber Erwartungsklarheit "
+         "wurde als Verbesserungsfeld genannt. Ich bin ehrlich gesagt oft selbst im Kundenkontakt."),
+        ("joey", "Joey",
+         "Gibt es Leute im Team die konstant ihre Ziele verfehlen — unabhängig von Methodik oder Markt?"),
+        ("vl", "Thomas",
+         "Ja, zwei machen mir wirklich Sorgen. Aber drei andere haben echtes Potenzial — "
+         "die könnten noch viel mehr."),
         ("thought", "Joey — innerlich",
-         "Interessant. Da sind noch offene Fragen. Das Training könnte helfen — aber es gibt Themen die wir parallel angehen müssen. Das gehört in den Business Case."),
+         "Führungsdefizite, ein verlorener Top-Performer, Erwartungsunklarheit — "
+         "das ist kein reines Training-Problem. Ich muss das im Business Case benennen."),
+
+        # 3. Jetzt die Zahlen
+        ("joey", "Joey",
+         "Danke Thomas — das hilft mir sehr. Jetzt brauche ich die Zahlen für den Business Case. "
+         "Wie viele Leads habt ihr aktuell pro Monat?"),
+        ("vl", "Thomas", "Ungefähr 200. Manchmal mehr, selten weniger."),
+        ("joey", "Joey", "Durchschnittlicher Deal-Wert?"),
+        ("vl", "Thomas", "15.000 €. Das ist realistisch."),
+        ("joey", "Joey", "Marge pro Deal — nach Kosten?"),
+        ("vl", "Thomas", "Etwa 25%."),
+        ("joey", "Joey",
+         "Woher weiß ich, dass 25% Abschlussquote erreichbar ist — und nicht nur ein Anbieterversprechen?"),
+        ("vl", "Thomas",
+         "Zwei Referenzkunden — beide haben nach dem Training zwischen 22 und 28% erreicht. "
+         "Ich kann dir die Kontakte geben."),
+
+        # 4. Pilot-Idee
+        ("joey", "Joey",
+         "Letzte Überlegung: Was wäre wenn wir zunächst nur 2-3 Top-Performer schicken — als Pilot? "
+         "Geringeres Risiko, und wenn es wirkt bauen wir ein Train-the-Trainer Konzept."),
+        ("vl", "Thomas",
+         "Das gefällt mir. Kostet weniger und die drei sind hoch motiviert. "
+         "Wenn es läuft, ziehen wir alle nach."),
+        ("thought", "Joey — innerlich",
+         "Gut. Ich habe jetzt das vollständige Bild: Führungsthemen parallel adressieren, "
+         "zwei Szenarien für den Business Case — Volltraining oder Pilot. Beides rechne ich durch."),
     ]
 
     for kind, speaker, text in exchanges:
