@@ -6,6 +6,13 @@ from dataclasses import dataclass
 from typing import Optional
 import json
 import requests
+from io import BytesIO
+from reportlab.lib.pagesizes import A4
+from reportlab.lib import colors
+from reportlab.lib.units import mm
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, HRFlowable
+from reportlab.lib.styles import ParagraphStyle
+from reportlab.lib.enums import TA_LEFT, TA_CENTER, TA_RIGHT
 
 # ─── Page Config ─────────────────────────────────────────────────────────────
 st.set_page_config(
@@ -359,32 +366,50 @@ STEP_META = [
 ]
 
 def render_progress(current):
-    dots = ""
-    for i, (icon, label) in enumerate(STEP_META, 1):
-        if i < current:
-            dot_cls, line_cls = "prog-dot-done", "prog-line-done"
-        elif i == current:
-            dot_cls, line_cls = "prog-dot-active", "prog-line-active"
-        else:
-            dot_cls, line_cls = "prog-dot-pending", "prog-line-pending"
-
-        line = f'<div class="prog-line {line_cls}"></div>' if i < len(STEP_META) else ""
-        dots += f"""
-        <div class="prog-item">
-            <div class="prog-dot {dot_cls}" title="{label}">
-                <i class="fa-solid {icon}"></i>
-            </div>
-            {line}
-        </div>"""
-
     label_text = STEP_META[current - 1][1]
+
     st.markdown(f"""
     <div class="progress-label">
         <i class="fa-solid fa-location-dot"></i>&nbsp;
         Schritt {current} von {len(STEP_META)} — {label_text}
-    </div>
-    <div class="progress-steps">{dots}</div>
-    """, unsafe_allow_html=True)
+    </div>""", unsafe_allow_html=True)
+
+    cols = st.columns(len(STEP_META) * 2 - 1)
+    for i, (icon, label) in enumerate(STEP_META, 1):
+        col_idx = (i - 1) * 2
+        if i < current:
+            bg, color = "#B8BCDE", "#1E2A5E"
+        elif i == current:
+            bg, color = "#1E2A5E", "#F5F0E6"
+        else:
+            bg, color = "#E5E1D8", "#C4C0B8"
+
+        shadow = "box-shadow:0 0 0 3px rgba(30,42,94,0.18);" if i == current else ""
+        label_color = "#1E2A5E" if i <= current else "#C4C0B8"
+        label_weight = "600" if i == current else "400"
+
+        with cols[col_idx]:
+            st.markdown(f"""
+            <div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
+                <div style="width:32px;height:32px;border-radius:50%;
+                            background:{bg};color:{color};{shadow}
+                            display:flex;align-items:center;justify-content:center;
+                            font-size:0.75rem;margin:0 auto;">
+                    <i class="fa-solid {icon}"></i>
+                </div>
+                <div style="font-size:0.62rem;color:{label_color};text-align:center;
+                            font-weight:{label_weight};white-space:nowrap;">{label}</div>
+            </div>""", unsafe_allow_html=True)
+
+        if i < len(STEP_META):
+            line_color = "#B8BCDE" if i < current else "#E5E1D8"
+            with cols[col_idx + 1]:
+                st.markdown(f"""
+                <div style="height:32px;display:flex;align-items:center;padding:0 2px;">
+                    <div style="height:2px;width:100%;background:{line_color};border-radius:1px;"></div>
+                </div>""", unsafe_allow_html=True)
+
+    st.markdown("<div style='margin-bottom:1.8rem;'></div>", unsafe_allow_html=True)
 
 
 # ─── Speaker Helper ───────────────────────────────────────────────────────────
@@ -766,6 +791,213 @@ def step5():
         st.rerun()
 
 
+# ─── PDF Generator ────────────────────────────────────────────────────────────
+def generate_pdf(r, p):
+    buf = BytesIO()
+    doc = SimpleDocTemplate(buf, pagesize=A4,
+                            leftMargin=18*mm, rightMargin=18*mm,
+                            topMargin=16*mm, bottomMargin=16*mm)
+
+    NAVY   = colors.HexColor("#1E2A5E")
+    LAV    = colors.HexColor("#B8BCDE")
+    CREAM  = colors.HexColor("#F5F0E6")
+    GRAY   = colors.HexColor("#6B7280")
+    GREEN  = colors.HexColor("#059669")
+    WHITE  = colors.white
+
+    def sty(name, **kw):
+        base = ParagraphStyle(name, **kw)
+        return base
+
+    s_header   = sty("header",   fontSize=22, textColor=NAVY,  leading=28, fontName="Helvetica-Bold")
+    s_sub      = sty("sub",      fontSize=8,  textColor=GRAY,  leading=12, fontName="Helvetica", spaceAfter=6)
+    s_section  = sty("section",  fontSize=11, textColor=NAVY,  leading=16, fontName="Helvetica-Bold", spaceBefore=10, spaceAfter=4)
+    s_body     = sty("body",     fontSize=9,  textColor=NAVY,  leading=14, fontName="Helvetica")
+    s_bodygray = sty("bodygray", fontSize=8,  textColor=GRAY,  leading=12, fontName="Helvetica")
+    s_kpi_val  = sty("kpival",   fontSize=18, textColor=WHITE, leading=22, fontName="Helvetica-Bold", alignment=TA_CENTER)
+    s_kpi_lbl  = sty("kpilbl",   fontSize=7,  textColor=LAV,   leading=10, fontName="Helvetica",      alignment=TA_CENTER)
+    s_footer   = sty("footer",   fontSize=7,  textColor=GRAY,  leading=10, fontName="Helvetica",      alignment=TA_CENTER)
+    s_arg_ttl  = sty("argttl",   fontSize=9,  textColor=NAVY,  leading=13, fontName="Helvetica-Bold")
+    s_arg_body = sty("argbody",  fontSize=8,  textColor=GRAY,  leading=12, fontName="Helvetica")
+
+    story = []
+
+    # ── Header ──
+    story.append(Paragraph("HR loves Finance", s_header))
+    story.append(Paragraph(
+        f"Joey's Business Case &nbsp;·&nbsp; Sales Training ROI &nbsp;·&nbsp; {datetime.now().strftime('%d.%m.%Y')}",
+        s_sub))
+    story.append(HRFlowable(width="100%", thickness=1.5, color=NAVY, spaceAfter=10))
+
+    # ── KPI Table ──
+    story.append(Paragraph("Kern-Ergebnisse", s_section))
+
+    kpi_data = [
+        [Paragraph("GESAMTINVESTITION", s_kpi_lbl),
+         Paragraph("ZUSATZGEWINN/MONAT", s_kpi_lbl),
+         Paragraph("JAHRESGEWINN", s_kpi_lbl),
+         Paragraph("ROI", s_kpi_lbl),
+         Paragraph("PAYBACK", s_kpi_lbl)],
+        [Paragraph(fmt(r["total"]),  s_kpi_val),
+         Paragraph(fmt(r["mm"]),     s_kpi_val),
+         Paragraph(fmt(r["am"]),     s_kpi_val),
+         Paragraph(f"{r['roi']:.0f}%", s_kpi_val),
+         Paragraph(f"{r['pb']:.1f} Mon.", s_kpi_val)],
+    ]
+    kpi_table = Table(kpi_data, colWidths=[34*mm]*5)
+    kpi_table.setStyle(TableStyle([
+        ("BACKGROUND",  (0,0), (-1,-1), NAVY),
+        ("ROWBACKGROUNDS", (0,0), (-1,-1), [NAVY, NAVY]),
+        ("TOPPADDING",  (0,0), (-1,-1), 6),
+        ("BOTTOMPADDING",(0,0),(-1,-1), 6),
+        ("LEFTPADDING", (0,0), (-1,-1), 3),
+        ("RIGHTPADDING",(0,0), (-1,-1), 3),
+        ("INNERGRID",   (0,0), (-1,-1), 0.5, colors.HexColor("#2E3D6E")),
+        ("BOX",         (0,0), (-1,-1), 0,   NAVY),
+        ("ROUNDEDCORNERS", [4], None, None),
+    ]))
+    story.append(kpi_table)
+    story.append(Spacer(1, 8))
+
+    # ── Calculation ──
+    story.append(Paragraph("Kalkulation im Detail", s_section))
+    calc_data = [
+        ["Parameter", "Berechnung", "Ergebnis"],
+        ["Trainingskosten",
+         f"{p.participants} Teilnehmer x {fmt(p.cost_per_person)}",
+         fmt(r["tc"])],
+        ["Ausfallkosten",
+         f"{p.participants} x {p.training_days} Tage x {p.daily_rate:.0f} EUR",
+         fmt(r["oc"])],
+        ["Gesamtinvestition", "", fmt(r["total"])],
+        ["Zusaetzliche Deals/Monat",
+         f"{p.monthly_leads} Leads x ({p.target_rate}% - {p.current_rate}%)",
+         f"{r['ad']:.1f} Deals"],
+        ["Mehrumsatz/Monat",
+         f"{r['ad']:.1f} Deals x {fmt(p.deal_value)}",
+         fmt(r["mr"])],
+        ["Zusatzgewinn/Monat",
+         f"{fmt(r['mr'])} x {p.margin_rate}%",
+         fmt(r["mm"])],
+        ["Jahresgewinn", "x 12 Monate", fmt(r["am"])],
+        ["ROI",
+         f"({fmt(r['net'])} / {fmt(r['total'])}) x 100",
+         f"{r['roi']:.0f}%"],
+        ["Payback",
+         f"{fmt(r['total'])} / {fmt(r['mm'])}",
+         f"{r['pb']:.1f} Monate"],
+    ]
+    styled_calc = []
+    for row in calc_data:
+        styled_calc.append([
+            Paragraph(str(row[0]), s_body),
+            Paragraph(str(row[1]), s_bodygray),
+            Paragraph(str(row[2]), s_body),
+        ])
+
+    calc_table = Table(styled_calc, colWidths=[50*mm, 80*mm, 40*mm])
+    calc_table.setStyle(TableStyle([
+        ("BACKGROUND",   (0,0), (-1,0),  LAV),
+        ("TEXTCOLOR",    (0,0), (-1,0),  NAVY),
+        ("FONTNAME",     (0,0), (-1,0),  "Helvetica-Bold"),
+        ("FONTSIZE",     (0,0), (-1,0),  8),
+        ("ROWBACKGROUNDS",(0,1),(-1,-1), [WHITE, colors.HexColor("#F9F8F5")]),
+        ("BACKGROUND",   (0,3), (-1,3),  colors.HexColor("#EEF0F8")),
+        ("BACKGROUND",   (0,7), (-1,7),  colors.HexColor("#EEF0F8")),
+        ("FONTNAME",     (2,3), (2,3),   "Helvetica-Bold"),
+        ("FONTNAME",     (2,7), (2,7),   "Helvetica-Bold"),
+        ("FONTNAME",     (2,8), (2,8),   "Helvetica-Bold"),
+        ("FONTNAME",     (2,9), (2,9),   "Helvetica-Bold"),
+        ("TOPPADDING",   (0,0), (-1,-1), 5),
+        ("BOTTOMPADDING",(0,0), (-1,-1), 5),
+        ("LEFTPADDING",  (0,0), (-1,-1), 6),
+        ("RIGHTPADDING", (0,0), (-1,-1), 6),
+        ("GRID",         (0,0), (-1,-1), 0.4, colors.HexColor("#E5E1D8")),
+        ("BOX",          (0,0), (-1,-1), 1,   LAV),
+    ]))
+    story.append(calc_table)
+    story.append(Spacer(1, 8))
+
+    # ── Arguments ──
+    story.append(Paragraph("Top-Argumente fuer CFO und CEO", s_section))
+    args = [
+        ("Gewinn, nicht Umsatz",
+         f"Das Training generiert {fmt(r['am'])} zusaetzlichen Jahresgewinn — echter Deckungsbeitrag."),
+        ("Schnelle Amortisation",
+         f"Payback in {r['pb']:.1f} Monaten — schneller als jede Software-Einfuehrung."),
+        ("Opportunitaetskosten des Abwartens",
+         f"Jeder Monat ohne Training kostet {fmt(r['mm'])} entgangenen Gewinn."),
+        ("Begrenzter Downside",
+         f"Selbst bei nur 20% Abschlussquote bleibt der ROI positiv."),
+        ("Referenzen statt Versprechen",
+         "Zwei Kunden des Anbieters haben 22-28% erreicht — Marktdaten, kein Pitch."),
+    ]
+    arg_data = []
+    for title, text in args:
+        arg_data.append([
+            Paragraph(title, s_arg_ttl),
+            Paragraph(text, s_arg_body)
+        ])
+    arg_table = Table(arg_data, colWidths=[50*mm, 120*mm])
+    arg_table.setStyle(TableStyle([
+        ("ROWBACKGROUNDS", (0,0), (-1,-1), [WHITE, colors.HexColor("#F9F8F5")]),
+        ("TOPPADDING",    (0,0), (-1,-1), 5),
+        ("BOTTOMPADDING", (0,0), (-1,-1), 5),
+        ("LEFTPADDING",   (0,0), (-1,-1), 6),
+        ("RIGHTPADDING",  (0,0), (-1,-1), 6),
+        ("GRID",          (0,0), (-1,-1), 0.4, colors.HexColor("#E5E1D8")),
+        ("BOX",           (0,0), (-1,-1), 1,   LAV),
+        ("VALIGN",        (0,0), (-1,-1), "TOP"),
+    ]))
+    story.append(arg_table)
+    story.append(Spacer(1, 8))
+
+    # ── Scenarios ──
+    story.append(Paragraph("Szenarien im Vergleich", s_section))
+    cons_ad = p.monthly_leads * 0.20 - (p.monthly_leads * p.current_rate / 100)
+    cons_am = cons_ad * p.deal_value * (p.margin_rate / 100) * 12
+    cons_roi = ((cons_am - r["total"]) / r["total"]) * 100
+
+    sc_data = [
+        [Paragraph("Szenario", s_body), Paragraph("Abschlussquote", s_body),
+         Paragraph("Jahresgewinn", s_body), Paragraph("ROI", s_body)],
+        [Paragraph("Konservativ", s_body), Paragraph("20%", s_bodygray),
+         Paragraph(fmt(cons_am), s_body), Paragraph(f"{cons_roi:.0f}%", s_body)],
+        [Paragraph("Realistisch", s_body), Paragraph(f"{p.target_rate}%", s_bodygray),
+         Paragraph(fmt(r["am"]), s_body), Paragraph(f"{r['roi']:.0f}%", s_body)],
+        [Paragraph("Optimistisch", s_body), Paragraph("+25% ueber Ziel", s_bodygray),
+         Paragraph(fmt(r["am"]*1.25), s_body),
+         Paragraph(f"{((r['am']*1.25 - r['total'])/r['total']*100):.0f}%", s_body)],
+    ]
+    sc_table = Table(sc_data, colWidths=[40*mm, 40*mm, 55*mm, 35*mm])
+    sc_table.setStyle(TableStyle([
+        ("BACKGROUND",    (0,0), (-1,0),  LAV),
+        ("FONTNAME",      (0,0), (-1,0),  "Helvetica-Bold"),
+        ("FONTSIZE",      (0,0), (-1,0),  8),
+        ("ROWBACKGROUNDS",(0,1),(-1,-1),  [WHITE, colors.HexColor("#F9F8F5")]),
+        ("BACKGROUND",    (0,2), (-1,2),  colors.HexColor("#D1FAE5")),
+        ("TOPPADDING",    (0,0), (-1,-1), 5),
+        ("BOTTOMPADDING", (0,0), (-1,-1), 5),
+        ("LEFTPADDING",   (0,0), (-1,-1), 6),
+        ("RIGHTPADDING",  (0,0), (-1,-1), 6),
+        ("GRID",          (0,0), (-1,-1), 0.4, colors.HexColor("#E5E1D8")),
+        ("BOX",           (0,0), (-1,-1), 1,   LAV),
+    ]))
+    story.append(sc_table)
+
+    # ── Footer ──
+    story.append(Spacer(1, 12))
+    story.append(HRFlowable(width="100%", thickness=0.5, color=LAV, spaceAfter=6))
+    story.append(Paragraph(
+        "HR loves Finance  ·  Anne Schuster Consulting  ·  anneschuster.com  ·  CIMA Fellow (FCMA, CGMA)",
+        s_footer))
+
+    doc.build(story)
+    buf.seek(0)
+    return buf.read()
+
+
+
 def step6():
     render_progress(6)
     r = st.session_state.results
@@ -889,34 +1121,16 @@ def step6():
 
     # Export + Restart
     st.markdown("<hr>", unsafe_allow_html=True)
-    export = {
-        "timestamp": datetime.now().isoformat(),
-        "scenario": "Joey — Sales Training Business Case",
-        "ergebnisse": {
-            "gesamtinvestition": r["total"],
-            "zusatzgewinn_monat": r["mm"],
-            "jahresgewinn": r["am"],
-            "roi_prozent": round(r["roi"], 1),
-            "payback_monate": round(r["pb"], 1)
-        }
-    }
-    txt = f"""Joey's Business Case · Sales Training ROI
-{datetime.now().strftime('%d.%m.%Y')}
-
-Gesamtinvestition:  {fmt(r['total'])}
-Zusatzgewinn/Monat: {fmt(r['mm'])}
-Jahresgewinn:       {fmt(r['am'])}
-ROI:                {r['roi']:.0f}%
-Payback:            {r['pb']:.1f} Monate
-"""
-    c1, c2, c3, _ = st.columns([1, 1, 1, 3])
+    c1, c2, _ = st.columns([1, 1, 4])
     with c1:
-        st.download_button("⬇ JSON", json.dumps(export, indent=2, ensure_ascii=False),
-                           f"joey_{datetime.now().strftime('%Y%m%d')}.json", "application/json")
+        pdf_bytes = generate_pdf(r, p)
+        st.download_button(
+            "⬇ PDF herunterladen",
+            data=pdf_bytes,
+            file_name=f"joey_business_case_{datetime.now().strftime('%Y%m%d')}.pdf",
+            mime="application/pdf"
+        )
     with c2:
-        st.download_button("⬇ Text", txt,
-                           f"joey_{datetime.now().strftime('%Y%m%d')}.txt", "text/plain")
-    with c3:
         if st.button("Von vorne starten"):
             for k in ["step","path","swifty_messages","params","results"]:
                 st.session_state.pop(k, None)
