@@ -736,8 +736,16 @@ def step3():
         </div>""", unsafe_allow_html=True)
 
         items = [
+            ("fa-lightbulb", "Ist Training wirklich die richtige Antwort?",
+             "Haben wir Führungsprobleme im Team? Sind Prozesse unklar? Fehlt Motivation — oder echtes Skill-Gap? Training löst nur das letzte."),
+            ("fa-people-group", "Führung & Teamdynamik prüfen",
+             "Wie führt Thomas sein Team? Gibt es Fluktuation, Demotivation oder fehlende Klarheit über Erwartungen — Symptome die kein Training behebt."),
+            ("fa-magnifying-glass", "Was ist das eigentliche Problem?",
+             "Warum stagniert die Abschlussquote bei 15%? Fähigkeitslücke, Prozess, Markt — oder alles zusammen?"),
+            ("fa-chart-line", "Marktdruck & Wettbewerb",
+             "Was macht die Konkurrenz anders? Hat der Wettbewerb bessere Abschlussquoten — und wenn ja, warum?"),
             ("fa-circle-question", "Warum jetzt?",
-             "Das Sales-Team stagniert seit Q3 bei 15%. Thomas hat konkrete Marktdaten."),
+             "Warum ist dieser Moment der richtige — und nicht in 6 Monaten? Was verschärft die Dringlichkeit?"),
             ("fa-triangle-exclamation", "Was passiert bei Nicht-Investition?",
              "Entgangener Gewinn jeden Monat — der Status quo ist nicht kostenlos."),
             ("fa-table-list", "Welche Zahlen brauche ich?",
