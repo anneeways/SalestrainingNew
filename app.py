@@ -272,24 +272,6 @@ html, body, [class*="css"] { font-family: 'Segoe UI', system-ui, -apple-system, 
 }
 .stButton > button:hover { opacity: 0.82 !important; }
 
-/* Hide invisible nav trigger buttons */
-[data-testid="stButton"] button:empty,
-[data-testid="stButton"] button[kind="secondary"]:not([data-nav-visible]) {
-    display: none !important;
-}
-/* Nav buttons — zero height hidden triggers */
-.nav-btn-hide > div > button {
-    position: absolute !important;
-    opacity: 0 !important;
-    width: 100% !important;
-    height: 100% !important;
-    top: 0 !important; left: 0 !important;
-    cursor: pointer !important;
-    z-index: 10 !important;
-}
-.nav-btn-wrap {
-    position: relative;
-}
 
 hr { border: none; border-top: 1px solid #EAE7DF; margin: 1.6rem 0; }
 label { color: #1E2A5E !important; font-weight: 500; }
