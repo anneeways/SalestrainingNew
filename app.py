@@ -36,9 +36,12 @@ st.markdown("""
 <style>
 /* Segoe UI — system font */
 
-/* ══ GLOBAL BUTTON OVERRIDE ══ */
-button, .stButton > button, [data-testid="stBaseButton-secondary"],
-[data-testid="stBaseButton-primary"], [data-baseweb="button"] {
+/* ══ GLOBAL BUTTON OVERRIDE — only main content area ══ */
+section[data-testid="stMain"] button,
+section.main button,
+div[data-testid="stVerticalBlock"] button,
+div[data-testid="stHorizontalBlock"] button,
+.stButton > button {
     background-color: #1E2A5E !important;
     color: #ffffff !important;
     border: none !important;
@@ -46,7 +49,10 @@ button, .stButton > button, [data-testid="stBaseButton-secondary"],
     font-weight: 600 !important;
     box-shadow: 0 2px 8px rgba(30,42,94,0.2) !important;
 }
-button:hover { opacity: 0.88 !important; background-color: #253472 !important; }
+section[data-testid="stMain"] button:hover { 
+    opacity: 0.88 !important; 
+    background-color: #253472 !important; 
+}
 
 html, body, [class*="css"] { font-family: 'Segoe UI', system-ui, sans-serif; }
 .stApp { background-color: #E8E3D8; }
