@@ -326,7 +326,7 @@ def init():
     for k, v in {
         "step": 1, "path": None, "max_steps": 7,
         "swifty_messages": [], "params": None, "results": None,
-        "prep_notes": {}, "status_quo": {}, "recommendation": "Volltraining"
+        "prep_notes": {}, "status_quo": {}, "recommendation": "Volltraining", "ai_summary": ""
     }.items():
         if k not in st.session_state:
             st.session_state[k] = v
@@ -958,6 +958,105 @@ def step4():
         st.rerun()
 
 
+# ─── AI Summary Generator ─────────────────────────────────────────────────────
+def generate_ai_summary(notes: dict, status_quo: dict, results: dict) -> str:
+    """Generate board summary suggestions from checklist notes"""
+    try:
+        key = st.secrets.get("ANTHROPIC_API_KEY", "")
+        if not key:
+            return "⚠️ Kein API-Key konfiguriert."
+
+        notes_text = "\n".join([f"- {k}: {v}" for k, v in notes.items() if v])
+        sq_text = "\n".join([f"- {k}: {v}" for k, v in status_quo.items() if v])
+        res_text = f"""
+- Gesamtinvestition: {results.get("total", 0):,.0f} €
+- Jahresgewinn: {results.get("am", 0):,.0f} €
+- ROI: {results.get("roi", 0):.0f}%
+- Payback: {results.get("pb", 0):.1f} Monate
+""" if results else ""
+
+        prompt = f"""Du bist ein erfahrener CFO-Berater und hilfst einer HR Business Partnerin dabei,
+einen Business Case für den Vorstand vorzubereiten.
+
+Basierend auf den folgenden gesammelten Informationen, erstelle eine strukturierte Zusammenfassung
+mit konkreten Vorschlägen für die Vorstandspräsentation.
+
+STATUS QUO:
+{sq_text}
+
+ERKENNTNISSE AUS DER ANALYSE:
+{notes_text}
+
+FINANZKENNZAHLEN:
+{res_text}
+
+Erstelle eine Zusammenfassung mit folgender Struktur:
+1. KERNAUSSAGE (1-2 Sätze — das wichtigste Argument)
+2. AUSGANGSLAGE (3-4 Punkte — was steht auf dem Spiel)
+3. EMPFEHLUNG (klar und entscheidungsreif)
+4. FINANZIELLE BEGRÜNDUNG (die wichtigsten Zahlen)
+5. RISIKEN & MASSNAHMEN (was noch zu klären ist)
+6. NÄCHSTE SCHRITTE (konkret, mit Zeitrahmen)
+
+Schreibe präzise, direkt und auf CFO-Niveau. Deutsch. Maximal 350 Wörter."""
+
+        import requests
+        r = requests.post(
+            "https://api.anthropic.com/v1/messages",
+            headers={"x-api-key": key, "anthropic-version": "2023-06-01",
+                     "content-type": "application/json"},
+            json={"model": "claude-opus-4-5", "max_tokens": 600,
+                  "messages": [{"role": "user", "content": prompt}]},
+            timeout=30
+        )
+        return r.json()["content"][0]["text"]
+    except Exception as e:
+        return f"Fehler: {e}"
+
+
+# ─── Charts ───────────────────────────────────────────────────────────────────
+def make_charts(r):
+    navy, lav, cream = "#1E2A5E", "#B8BCDE", "#F5F0E6"
+    fig = make_subplots(
+        rows=1, cols=2,
+        subplot_titles=("Investition vs. Jahresgewinn", "Break-even Verlauf"),
+        horizontal_spacing=0.12
+    )
+    fig.add_trace(go.Bar(
+        x=["💸 Investition", "📈 Jahresgewinn"],
+        y=[r["total"], r["am"]],
+        marker_color=[lav, navy],
+        text=[fmt(r["total"]), fmt(r["am"])],
+        textposition="auto",
+        textfont=dict(color=[navy, cream]),
+    ), row=1, col=1)
+
+    months = list(range(13))
+    cum = [-r["total"]]
+    for _ in range(12):
+        cum.append(cum[-1] + r["mm"])
+
+    fig.add_trace(go.Scatter(
+        x=months, y=cum, mode="lines+markers",
+        line=dict(color=navy, width=3),
+        marker=dict(color=navy, size=7),
+        fill="tozeroy", fillcolor="rgba(30,42,94,0.08)",
+    ), row=1, col=2)
+    fig.add_hline(y=0, line_dash="dash", line_color="#DC2626",
+                  annotation_text=f"  Break-even: Monat {r['pb']:.1f}",
+                  annotation_font_color="#DC2626", row=1, col=2)
+
+    fig.update_layout(
+        height=300, showlegend=False,
+        plot_bgcolor=cream, paper_bgcolor=cream,
+        font=dict(family="Segoe UI, system-ui, sans-serif", color=navy),
+        margin=dict(t=40, b=10, l=10, r=10)
+    )
+    fig.update_xaxes(showgrid=False, linecolor="#E5E7EB")
+    fig.update_yaxes(showgrid=True, gridcolor="#E5E7EB", linecolor="#E5E7EB")
+    return fig
+
+
 def step5():
     render_progress(5)
     render_nav()
@@ -1111,6 +1210,47 @@ def step5():
             f"wird in den Kalkulator und das Executive Summary übernommen.</div>",
             unsafe_allow_html=True
         )
+
+    # ── AI Zusammenfassung ────────────────────────────────────────────────────
+    st.markdown(
+        "<div style='background:#1E2A5E;border-radius:10px;padding:0.7rem 1.1rem;"
+        "margin:1rem 0 0.6rem;'><span style='color:#F5F0E6;font-weight:700;"
+        "font-size:0.9rem;'>🤖 Vorstandszusammenfassung generieren</span>"
+        "<span style='color:#B8BCDE;font-size:0.78rem;'>"
+        " &nbsp;·&nbsp; KI erstellt Vorschläge aus deinen Erkenntnissen</span></div>",
+        unsafe_allow_html=True
+    )
+
+    col_btn, col_info = st.columns([1, 3])
+    with col_btn:
+        generate = st.button("✨ Zusammenfassung erstellen", use_container_width=True)
+    with col_info:
+        st.markdown(
+            "<div style='font-size:0.82rem;color:#6B7280;padding-top:0.5rem;'>"
+            "Nutzt deine Checklisten-Notizen, Status Quo Daten und Finanzkennzahlen "
+            "um Vorschläge für die Vorstandspräsentation zu generieren.</div>",
+            unsafe_allow_html=True
+        )
+
+    if generate or st.session_state.get("ai_summary"):
+        if generate:
+            notes = {k: v for k, v in st.session_state.get("prep_notes", {}).items() if v and v.strip()}
+            sq = st.session_state.get("status_quo", {})
+            res = st.session_state.get("results", {})
+            with st.spinner("Swifty denkt …"):
+                summary = generate_ai_summary(notes, sq, res)
+            st.session_state.ai_summary = summary
+
+        if st.session_state.get("ai_summary"):
+            st.markdown("**📋 Vorschlag — editierbar:**")
+            edited = st.text_area(
+                label="Vorstandszusammenfassung",
+                value=st.session_state.ai_summary,
+                height=320,
+                label_visibility="collapsed",
+                key="ai_summary_edit"
+            )
+            st.session_state.ai_summary = edited
 
     st.markdown("<br>", unsafe_allow_html=True)
     if st.button("🧮  Weiter zum Kalkulator →"):
