@@ -528,29 +528,17 @@ def render_nav():
         ("fa-calculator",  "Kalkulator"),
         ("fa-chart-line",  "Ergebnis"),
     ]
-    # Render nav as HTML with FA icons
-    nav_html = "<div style='display:flex;gap:0.4rem;margin-bottom:1rem;'>"
-    for i, (fa, label) in enumerate(nav_meta, 1):
-        is_cur = (i == st.session_state.get("step", 1))
-        bg  = "#1E2A5E" if is_cur else "white"
-        col = "white"  if is_cur else "#1E2A5E"
-        bdr = "none"   if is_cur else "1.5px solid #1E2A5E"
-        nav_html += (
-            f"<div style='flex:1;background:{bg};color:{col};border:{bdr};"
-            f"border-radius:8px;padding:0.4rem 0.3rem;text-align:center;"
-            f"font-size:0.75rem;font-weight:600;cursor:pointer;'>"
-            f"<i class='fa-solid {fa}'></i><br>"
-            f"<span style='font-size:0.6rem;'>{label}</span></div>"
-        )
-    nav_html += "</div>"
-    st.markdown(nav_html, unsafe_allow_html=True)
-
-    # Hidden Streamlit buttons for actual click handling
+    # Navigation buttons
     cols = st.columns(6)
     for i, (col, (fa, label)) in enumerate(zip(cols, nav_meta), 1):
         with col:
-            if st.button(label, key=f"nav_jump_{i}", use_container_width=True,
-                         help=f"Zu: {label}"):
+            is_cur = (i == st.session_state.get("step", 1))
+            if st.button(
+                f"{label}",
+                key=f"nav_jump_{i}",
+                use_container_width=True,
+                type="primary" if is_cur else "secondary"
+            ):
                 st.session_state.step = i
                 st.rerun()
 
@@ -733,7 +721,7 @@ def step3():
              "Was wenn's nur 20% statt 25% werden? Ist der Business Case noch positiv?"),
         ]
 
-        for icon, title, detail in items:
+        for item_icon, title, detail in items:
             st.markdown(f"""
             <div class="check-item">
                 <div class="check-icon-wrap">
@@ -854,7 +842,7 @@ def step5():
     ]
 
     kpi_html = '<div class="kpi-grid">'
-    for icon, label, value, sub in kpis:
+    for kpi_icon, label, value, sub in kpis:
         kpi_html += f"""
         <div class="kpi-card">
             <div class="kpi-icon"></div>
@@ -1144,7 +1132,7 @@ def step6():
              "Zwei Kunden des Anbieters haben 22–28% erreicht. "
              "Das sind Marktdaten, kein Anbieter-Pitch."),
         ]
-        for icon, title, text in args:
+        for arg_icon, title, text in args:
             st.markdown(f"""
             <div class="arg-item">
                 <div class="arg-icon-wrap">
@@ -1172,7 +1160,7 @@ def step6():
             ("fa-circle", "badge-opt",  "OPTIMISTISCH", "+25% über Ziel",
              fmt(r["am"] * 1.25), f"{((r['am']*1.25 - r['total'])/r['total']*100):.0f}%"),
         ]
-        for icon, badge, label, sublabel, jahresgewinn, roi_v in scenarios:
+        for sc_icon, badge, label, sublabel, jahresgewinn, roi_v in scenarios:
             st.markdown(f"""
             <div class="scenario-tile">
                 <div class="s-badge {badge}">
