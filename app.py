@@ -730,9 +730,9 @@ def step3():
     else:
         st.markdown('<div class="scene-header">Deine Vorbereitungs-Checkliste</div>', unsafe_allow_html=True)
         st.markdown("""
-        <div class="scene-sub">
-            ✅
-            Was Joey klären muss — bevor sie rechnet
+        <div style="font-size:0.78rem;color:#059669;font-weight:700;letter-spacing:0.07em;
+                    text-transform:uppercase;margin-bottom:1.2rem;">
+            ✅ &nbsp;Was Joey klären muss — bevor sie rechnet
         </div>""", unsafe_allow_html=True)
 
         items = [
