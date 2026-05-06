@@ -820,8 +820,16 @@ def step4():
         ("vl", "Thomas",
          "Wir haben zwei Referenzkunden bekommen. Beide haben nach dem Training zwischen 22 und 28% "
          "erreicht. Ich kann dir die Kontakte geben."),
+        ("joey",    "Joey",
+         "Thomas, noch eine wichtigere Frage: Sind wir sicher, dass wir die richtigen Leute im Team haben? Training bringt wenig, wenn das Problem woanders liegt."),
+        ("vl",      "Thomas",
+         "Gute Frage. Zwei Leute machen mir Sorgen — die kommen schon lange nicht mehr auf ihre Ziele. Aber drei andere haben wirklich Potenzial."),
+        ("joey",    "Joey",
+         "Und wie führst du das Team gerade? Gibt es klare Erwartungen, regelmäßiges Feedback — oder läuft vieles informal?"),
+        ("vl",      "Thomas",
+         "Ehrlich gesagt... könnten wir da besser sein. Ich bin viel im Kundenkontakt selbst."),
         ("thought", "Joey — innerlich",
-         "Gut. Ich hab alles was ich brauche. Jetzt rechne ich."),
+         "Interessant. Da sind noch offene Fragen. Das Training könnte helfen — aber es gibt Themen die wir parallel angehen müssen. Das gehört in den Business Case."),
     ]
 
     for kind, speaker, text in exchanges:
