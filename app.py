@@ -304,7 +304,8 @@ label { color: #1E2A5E !important; font-weight: 500; }
 def init():
     for k, v in {
         "step": 1, "path": None,
-        "swifty_messages": [], "params": None, "results": None
+        "swifty_messages": [], "params": None, "results": None,
+        "prep_notes": {}
     }.items():
         if k not in st.session_state:
             st.session_state[k] = v
