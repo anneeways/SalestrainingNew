@@ -933,7 +933,6 @@ def generate_pdf(r, p):
         ("RIGHTPADDING",(0,0), (-1,-1), 3),
         ("INNERGRID",   (0,0), (-1,-1), 0.5, colors.HexColor("#2E3D6E")),
         ("BOX",         (0,0), (-1,-1), 0,   NAVY),
-        ("ROUNDEDCORNERS", [4], None, None),
     ]))
     story.append(kpi_table)
     story.append(Spacer(1, 8))
