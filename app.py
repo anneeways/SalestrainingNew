@@ -12,791 +12,949 @@ st.set_page_config(
     page_title="Joey's Business Case | HR loves Finance",
     page_icon="🎯",
     layout="wide",
-    initial_sidebar_state="expanded"
+    initial_sidebar_state="collapsed"
 )
 
-# ─── Custom CSS ───────────────────────────────────────────────────────────────
+# ─── Font Awesome ─────────────────────────────────────────────────────────────
+st.markdown("""
+<link rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+  crossorigin="anonymous" referrerpolicy="no-referrer" />
+""", unsafe_allow_html=True)
+
+# ─── CSS ─────────────────────────────────────────────────────────────────────
 st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap');
 
-html, body, [class*="css"] {
-    font-family: 'DM Sans', sans-serif;
-}
+html, body, [class*="css"] { font-family: 'DM Sans', sans-serif; }
+.stApp { background-color: #F5F0E6; }
 
-/* ── App Background ── */
-.stApp {
-    background-color: #F5F0E6;
+/* ── Progress ── */
+.progress-label {
+    font-size: 0.72rem; color: #9CA3AF;
+    letter-spacing: 0.07em; text-transform: uppercase;
+    font-weight: 600; margin-bottom: 0.8rem;
 }
+.progress-steps {
+    display: flex; gap: 0.6rem; margin-bottom: 2.2rem; align-items: center;
+}
+.prog-item {
+    display: flex; align-items: center; gap: 0.45rem; flex: 1;
+}
+.prog-dot {
+    width: 30px; height: 30px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.75rem; flex-shrink: 0; transition: all 0.2s;
+}
+.prog-dot-done    { background: #B8BCDE; color: #1E2A5E; }
+.prog-dot-active  { background: #1E2A5E; color: #F5F0E6;
+                    box-shadow: 0 0 0 3px rgba(30,42,94,0.15); }
+.prog-dot-pending { background: #E5E1D8; color: #C4C0B8; }
+.prog-line {
+    flex: 1; height: 2px; border-radius: 1px;
+}
+.prog-line-done    { background: #B8BCDE; }
+.prog-line-active  { background: linear-gradient(90deg, #B8BCDE 50%, #E5E1D8 50%); }
+.prog-line-pending { background: #E5E1D8; }
 
-/* ── Sidebar ── */
-[data-testid="stSidebar"] {
-    background-color: #1E2A5E !important;
-}
-[data-testid="stSidebar"] label,
-[data-testid="stSidebar"] .stMarkdown,
-[data-testid="stSidebar"] p,
-[data-testid="stSidebar"] span,
-[data-testid="stSidebar"] div {
-    color: #F5F0E6 !important;
-}
-[data-testid="stSidebar"] h1,
-[data-testid="stSidebar"] h2,
-[data-testid="stSidebar"] h3 {
-    color: #B8BCDE !important;
-    font-family: 'DM Serif Display', serif !important;
-}
-[data-testid="stSidebar"] .stSlider [data-testid="stSliderThumb"] {
-    background-color: #B8BCDE;
-}
-
-/* ── Main Title ── */
-.main-title {
+/* ── Typography ── */
+.scene-header {
     font-family: 'DM Serif Display', serif;
-    color: #1E2A5E;
-    font-size: 2.6rem;
-    line-height: 1.15;
-    margin-bottom: 0.2rem;
+    color: #1E2A5E; font-size: 1.9rem; margin-bottom: 0.25rem;
 }
-.main-subtitle {
-    color: #6B7280;
-    font-size: 1rem;
-    font-weight: 400;
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
-    margin-bottom: 2rem;
+.scene-sub {
+    color: #9CA3AF; font-size: 0.82rem; letter-spacing: 0.06em;
+    text-transform: uppercase; margin-bottom: 1.6rem;
+    display: flex; align-items: center; gap: 0.4rem;
 }
 
-/* ── Scenario Box ── */
-.scenario-box {
-    background: #1E2A5E;
-    border-radius: 16px;
-    padding: 2rem 2.4rem;
-    color: #F5F0E6;
-    margin-bottom: 1.5rem;
+/* ── Dialogue ── */
+.dialogue-box {
+    background: white; border-radius: 12px;
+    border: 1px solid #EAE7DF;
+    padding: 1.2rem 1.5rem; margin-bottom: 0.9rem;
+    box-shadow: 0 1px 4px rgba(30,42,94,0.05);
 }
-.scenario-box h2 {
+.speaker-row {
+    display: flex; align-items: center; gap: 0.5rem;
+    margin-bottom: 0.55rem;
+}
+.speaker-avatar {
+    width: 26px; height: 26px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.7rem; flex-shrink: 0;
+}
+.av-joey    { background: #1E2A5E; color: #F5F0E6; }
+.av-vl      { background: #E5E1D8; color: #6B7280; }
+.av-thought { background: #F3F4F6; color: #9CA3AF; }
+.speaker-name {
+    font-size: 0.72rem; font-weight: 700;
+    letter-spacing: 0.07em; text-transform: uppercase;
+}
+.sn-joey    { color: #1E2A5E; }
+.sn-vl      { color: #6B7280; }
+.sn-thought { color: #9CA3AF; }
+.dialogue-text   { color: #1E2A5E; font-size: 0.94rem; line-height: 1.75; }
+.dialogue-thought { color: #6B7280; font-size: 0.9rem; line-height: 1.7; font-style: italic; }
+
+/* ── Choice Cards ── */
+.choice-title {
     font-family: 'DM Serif Display', serif;
-    font-size: 1.5rem;
-    color: #B8BCDE;
-    margin-bottom: 1rem;
+    color: #1E2A5E; font-size: 1.25rem; margin: 1.2rem 0 1.1rem;
 }
-.scenario-box p {
-    font-size: 0.95rem;
-    line-height: 1.7;
-    opacity: 0.92;
+.choice-card-navy {
+    background: #1E2A5E; border-radius: 14px; padding: 1.7rem;
+    color: #F5F0E6; margin-bottom: 0.8rem;
+}
+.choice-card-light {
+    background: white; border: 1.5px solid #1E2A5E;
+    border-radius: 14px; padding: 1.7rem; margin-bottom: 0.8rem;
+}
+.choice-icon {
+    width: 48px; height: 48px; border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.3rem; margin-bottom: 1rem;
+}
+.ci-navy  { background: rgba(184,188,222,0.25); color: #B8BCDE; }
+.ci-light { background: #F5F0E6; color: #1E2A5E; }
+.choice-card-navy h3  {
+    font-family: 'DM Serif Display', serif; font-size: 1.15rem;
+    color: #F5F0E6; margin-bottom: 0.5rem;
+}
+.choice-card-light h3 {
+    font-family: 'DM Serif Display', serif; font-size: 1.15rem;
+    color: #1E2A5E; margin-bottom: 0.5rem;
+}
+.choice-card-navy p  { font-size: 0.87rem; color: #B8BCDE; line-height: 1.7; }
+.choice-card-light p { font-size: 0.87rem; color: #6B7280; line-height: 1.7; }
+
+/* ── Swifty Chat ── */
+.swifty-header {
+    display: flex; align-items: center; gap: 0.7rem; margin-bottom: 1.2rem;
+}
+.swifty-avatar {
+    width: 40px; height: 40px; border-radius: 50%;
+    background: #D1FAE5; display: flex; align-items: center;
+    justify-content: center; font-size: 1.1rem; color: #059669;
+    flex-shrink: 0;
+}
+.swifty-label { font-size: 0.72rem; font-weight: 700; color: #059669;
+                letter-spacing: 0.07em; text-transform: uppercase; }
+.swifty-bubble {
+    background: #1E2A5E; color: #F5F0E6;
+    border-radius: 14px 14px 14px 4px;
+    padding: 1rem 1.3rem; margin: 0.4rem 0;
+    font-size: 0.93rem; line-height: 1.75; max-width: 82%;
+}
+.user-bubble {
+    background: #B8BCDE; color: #1E2A5E;
+    border-radius: 14px 14px 4px 14px;
+    padding: 0.9rem 1.2rem; margin: 0.4rem 0 0.4rem auto;
+    font-size: 0.93rem; line-height: 1.7;
+    max-width: 82%; text-align: right;
 }
 
-/* ── Mission Box ── */
-.mission-box {
-    background: #B8BCDE;
-    border-radius: 12px;
-    padding: 1.4rem 1.8rem;
-    margin-bottom: 1.2rem;
-    border-left: 4px solid #1E2A5E;
+/* ── Checklist ── */
+.check-item {
+    background: white; border-radius: 10px;
+    border: 1px solid #EAE7DF;
+    padding: 0.85rem 1.1rem; margin-bottom: 0.55rem;
+    display: flex; gap: 0.75rem; align-items: flex-start;
 }
-.mission-box h3 {
-    font-family: 'DM Serif Display', serif;
-    color: #1E2A5E;
-    font-size: 1.1rem;
-    margin-bottom: 0.6rem;
+.check-icon-wrap {
+    width: 24px; height: 24px; border-radius: 50%;
+    background: #D1FAE5; display: flex; align-items: center;
+    justify-content: center; flex-shrink: 0; margin-top: 0.1rem;
 }
-.mission-box ul {
-    margin: 0;
-    padding-left: 1.2rem;
-    color: #1E2A5E;
-    font-size: 0.92rem;
-    line-height: 1.8;
-}
+.check-icon-wrap i { font-size: 0.65rem; color: #059669; }
 
 /* ── KPI Cards ── */
+.kpi-grid { display: flex; gap: 0.9rem; margin: 1.3rem 0; flex-wrap: wrap; }
 .kpi-card {
-    background: #1E2A5E;
-    border-radius: 12px;
-    padding: 1.2rem 1.4rem;
-    text-align: center;
-    color: #F5F0E6;
+    background: #1E2A5E; border-radius: 12px;
+    padding: 1.1rem 1.2rem; color: #F5F0E6;
+    flex: 1; min-width: 120px;
 }
-.kpi-card .kpi-label {
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: #B8BCDE;
-    margin-bottom: 0.4rem;
+.kpi-icon { font-size: 1rem; color: #B8BCDE; margin-bottom: 0.5rem; }
+.kpi-label {
+    font-size: 0.68rem; text-transform: uppercase;
+    letter-spacing: 0.08em; color: #B8BCDE; margin-bottom: 0.25rem;
 }
-.kpi-card .kpi-value {
+.kpi-value {
     font-family: 'DM Serif Display', serif;
-    font-size: 1.8rem;
-    color: #F5F0E6;
-    line-height: 1;
+    font-size: 1.55rem; color: #F5F0E6; line-height: 1;
 }
-.kpi-card .kpi-sub {
-    font-size: 0.75rem;
-    color: #B8BCDE;
-    margin-top: 0.3rem;
-}
+.kpi-sub { font-size: 0.68rem; color: #B8BCDE; margin-top: 0.2rem; }
 
-/* ── Leitfragen ── */
-.leitfrage {
-    background: #F5F0E6;
-    border: 1.5px solid #1E2A5E;
-    border-radius: 10px;
-    padding: 0.9rem 1.2rem;
-    margin-bottom: 0.6rem;
-    color: #1E2A5E;
-    font-size: 0.92rem;
-    line-height: 1.5;
-}
-
-/* ── Chat Bubbles ── */
-.chat-user {
-    background: #1E2A5E;
-    color: #F5F0E6;
-    border-radius: 16px 16px 4px 16px;
-    padding: 0.8rem 1.1rem;
-    margin: 0.5rem 0;
-    font-size: 0.92rem;
-    line-height: 1.6;
-    max-width: 85%;
-    margin-left: auto;
-}
-.chat-agent {
-    background: #fff;
-    border: 1.5px solid #B8BCDE;
-    color: #1E2A5E;
-    border-radius: 16px 16px 16px 4px;
-    padding: 0.8rem 1.1rem;
-    margin: 0.5rem 0;
-    font-size: 0.92rem;
-    line-height: 1.6;
-    max-width: 85%;
-}
-
-/* ── Tabs ── */
-.stTabs [data-baseweb="tab-list"] {
-    background: transparent;
-    gap: 0.5rem;
-}
-.stTabs [data-baseweb="tab"] {
-    background: transparent;
-    border: 1.5px solid #1E2A5E;
-    border-radius: 8px;
-    color: #1E2A5E;
-    font-weight: 500;
-    padding: 0.4rem 1rem;
-}
-.stTabs [aria-selected="true"] {
-    background: #1E2A5E !important;
-    color: #F5F0E6 !important;
-}
-
-/* ── Recommendation blocks ── */
+/* ── Recommendation ── */
 .rec-success {
-    background: #D1FAE5;
-    border-left: 4px solid #059669;
-    border-radius: 8px;
-    padding: 1rem 1.4rem;
-    color: #065F46;
+    background: #D1FAE5; border-left: 4px solid #059669;
+    border-radius: 10px; padding: 1.1rem 1.4rem;
+    color: #065F46; margin: 1rem 0;
+    display: flex; gap: 0.8rem; align-items: flex-start;
 }
-.rec-warning {
-    background: #FEF3C7;
-    border-left: 4px solid #D97706;
-    border-radius: 8px;
-    padding: 1rem 1.4rem;
-    color: #92400E;
+.rec-success i { font-size: 1.1rem; margin-top: 0.1rem; color: #059669; }
+.rec-warn {
+    background: #FEF3C7; border-left: 4px solid #D97706;
+    border-radius: 10px; padding: 1.1rem 1.4rem;
+    color: #92400E; margin: 1rem 0;
+    display: flex; gap: 0.8rem; align-items: flex-start;
+}
+.rec-warn i { font-size: 1.1rem; margin-top: 0.1rem; color: #D97706; }
+
+/* ── Argument Items ── */
+.arg-item {
+    background: white; border-radius: 10px;
+    border: 1px solid #EAE7DF;
+    padding: 0.9rem 1.1rem; margin-bottom: 0.55rem;
+    display: flex; gap: 0.75rem; align-items: flex-start;
+}
+.arg-icon-wrap {
+    width: 26px; height: 26px; border-radius: 50%;
+    background: #EEF0F8; display: flex; align-items: center;
+    justify-content: center; flex-shrink: 0; margin-top: 0.1rem;
+}
+.arg-icon-wrap i { font-size: 0.65rem; color: #1E2A5E; }
+
+/* ── Scenario Tile ── */
+.scenario-tile {
+    background: white; border-radius: 10px;
+    border: 1px solid #EAE7DF;
+    padding: 0.9rem 1.1rem; margin-bottom: 0.55rem;
+}
+.scenario-tile .s-badge {
+    font-size: 0.7rem; font-weight: 700; letter-spacing: 0.06em;
+    text-transform: uppercase; margin-bottom: 0.3rem;
+    display: flex; align-items: center; gap: 0.4rem;
+}
+.badge-cons   { color: #3B82F6; }
+.badge-real   { color: #059669; }
+.badge-opt    { color: #D97706; }
+
+/* ── Calc Box ── */
+.calc-detail {
+    background: #F5F0E6; border-radius: 10px;
+    padding: 1rem 1.3rem; font-size: 0.86rem;
+    color: #1E2A5E; line-height: 2.1;
+    border: 1px solid #E5E1D8;
 }
 
-/* ── Divider ── */
-.navy-divider {
-    border: none;
-    border-top: 2px solid #1E2A5E;
-    margin: 1.5rem 0;
-    opacity: 0.15;
+/* ── Buttons ── */
+.stButton > button {
+    background: #1E2A5E !important; color: #F5F0E6 !important;
+    border: none !important; border-radius: 8px !important;
+    padding: 0.55rem 1.4rem !important;
+    font-family: 'DM Sans', sans-serif !important;
+    font-weight: 500 !important; font-size: 0.9rem !important;
+    transition: opacity 0.2s !important;
 }
+.stButton > button:hover { opacity: 0.82 !important; }
 
-/* ── Tag pill ── */
-.tag-pill {
-    display: inline-block;
-    background: #B8BCDE;
-    color: #1E2A5E;
-    border-radius: 20px;
-    padding: 0.2rem 0.8rem;
-    font-size: 0.78rem;
-    font-weight: 600;
-    letter-spacing: 0.04em;
-    margin-right: 0.4rem;
+hr { border: none; border-top: 1px solid #EAE7DF; margin: 1.6rem 0; }
+label { color: #1E2A5E !important; font-weight: 500; }
+
+.footer {
+    margin-top: 3rem; padding-top: 1rem;
+    border-top: 1px solid #E5E1D8;
+    text-align: center; color: #B0ABA0; font-size: 0.77rem;
+    display: flex; align-items: center; justify-content: center; gap: 0.6rem;
 }
 </style>
 """, unsafe_allow_html=True)
 
 
-# ─── Data Classes ─────────────────────────────────────────────────────────────
+# ─── Session State ────────────────────────────────────────────────────────────
+def init():
+    for k, v in {
+        "step": 1, "path": None,
+        "swifty_messages": [], "params": None, "results": None
+    }.items():
+        if k not in st.session_state:
+            st.session_state[k] = v
+
+init()
+
+
+# ─── Data ─────────────────────────────────────────────────────────────────────
 @dataclass
-class TrainingParameters:
-    participants: int
-    cost_per_person: float
-    monthly_leads: int
-    current_close_rate: float
-    target_close_rate: float
-    deal_value: float
-    margin_rate: float
+class Params:
+    participants: int = 10
+    cost_per_person: float = 2500
+    monthly_leads: int = 200
+    current_rate: float = 15.0
+    target_rate: float = 25.0
+    deal_value: float = 15000
+    margin_rate: float = 25.0
     training_days: int = 3
     daily_rate: float = 400.0
 
-@dataclass
-class ROIResults:
-    total_investment: float
-    training_costs: float
-    opportunity_costs: float
-    current_deals: float
-    target_deals: float
-    additional_deals: float
-    monthly_revenue: float
-    monthly_margin: float
-    annual_margin: float
-    roi_percentage: float
-    roi_multiple: float
-    payback_months: float
-    net_benefit: float
+def calculate(p: Params):
+    tc = p.participants * p.cost_per_person
+    oc = p.participants * p.training_days * p.daily_rate
+    total = tc + oc
+    cd = p.monthly_leads * (p.current_rate / 100)
+    td = p.monthly_leads * (p.target_rate / 100)
+    ad = td - cd
+    mr = ad * p.deal_value
+    mm = mr * (p.margin_rate / 100)
+    am = mm * 12
+    net = am - total
+    roi = (net / total) * 100 if total > 0 else 0
+    pb = (total / mm) if mm > 0 else 0
+    return dict(total=total, tc=tc, oc=oc, cd=cd, td=td, ad=ad,
+                mr=mr, mm=mm, am=am, net=net, roi=roi, pb=pb)
+
+def fmt(v): return f"{v:,.0f} €".replace(",", ".")
 
 
-# ─── Calculator ───────────────────────────────────────────────────────────────
-class SalesROICalculator:
-    def __init__(self):
-        self.parameters: Optional[TrainingParameters] = None
-        self.results: Optional[ROIResults] = None
+# ─── Swifty Agent ─────────────────────────────────────────────────────────────
+SWIFTY_SYSTEM = """Du bist Swifty — ein motivierender, warmherziger Business-Case-Coach für HR-Professionals.
 
-    def fmt(self, amount: float) -> str:
-        return f"{amount:,.0f} €".replace(",", ".")
-
-    def calculate(self, params: TrainingParameters) -> ROIResults:
-        self.parameters = params
-        training_costs = params.participants * params.cost_per_person
-        opportunity_costs = params.participants * params.training_days * params.daily_rate
-        total_investment = training_costs + opportunity_costs
-
-        current_deals = params.monthly_leads * (params.current_close_rate / 100)
-        target_deals = params.monthly_leads * (params.target_close_rate / 100)
-        additional_deals = target_deals - current_deals
-
-        monthly_revenue = additional_deals * params.deal_value
-        monthly_margin = monthly_revenue * (params.margin_rate / 100)
-        annual_margin = monthly_margin * 12
-
-        net_benefit = annual_margin - total_investment
-        roi_percentage = (net_benefit / total_investment) * 100 if total_investment > 0 else 0
-        roi_multiple = net_benefit / total_investment if total_investment > 0 else 0
-        payback_months = (total_investment / monthly_margin) if monthly_margin > 0 else 0
-
-        self.results = ROIResults(
-            total_investment=total_investment,
-            training_costs=training_costs,
-            opportunity_costs=opportunity_costs,
-            current_deals=current_deals,
-            target_deals=target_deals,
-            additional_deals=additional_deals,
-            monthly_revenue=monthly_revenue,
-            monthly_margin=monthly_margin,
-            annual_margin=annual_margin,
-            roi_percentage=roi_percentage,
-            roi_multiple=roi_multiple,
-            payback_months=payback_months,
-            net_benefit=net_benefit
-        )
-        return self.results
-
-
-# ─── AI Agent ─────────────────────────────────────────────────────────────────
-AGENT_SYSTEM_PROMPT = """Du bist ein erfahrener Finance-Coach und Business-Case-Begleiter für HR-Professionals.
-Deine Aufgabe ist es, die Teilnehmerin (sie spielt die Rolle von Joey, einer HR Business Partnerin) durch einen strukturierten Business-Case-Denkprozess zu führen.
-
-Du arbeitest nach diesem Framework (8 Schritte, aber beginne immer mit der Vorfrage):
-
-0. DIE VORFRAGE (essenziell, immer zuerst):
-   "Warum investieren wir hier – und warum jetzt?" 
-   Frage: Welches konkrete Problem lösen wir? Was passiert wenn wir nicht investieren? Ist das gerade wirklich die beste Verwendung knapper Ressourcen?
-
-1. Entscheidung klären: Was steht zur Entscheidung?
-2. Relevanten Hebel festlegen: Wo wirkt das auf die P&L? (Umsatz / Profitabilität / Risiko)
-3. Zentrale Annahmen explizit machen: Was glauben wir – und warum?
-4. Annahmen challengen: Hält das einer kritischen Betrachtung stand?
-5. Szenarien durchspielen: konservativ / realistisch / optimistisch
-6. Größenordnung einordnen: grob, nachvollziehbar, transparent
-7. Investition vs. Nicht-Tun: Was kostet die Initiative – was kostet Abwarten?
-8. Entscheidung ermöglichen: Ist das jetzt reif für eine Entscheidung?
-
-Das konkrete Szenario: Joey ist HR Business Partnerin. Das Sales-Team stagniert bei 15% Abschlussquote. Ein Training könnte diese auf 25% heben. Kosten: 25.000 €. Das übersteigt das Budget. CFO und CEO müssen überzeugt werden.
-
-Dein Stil:
-- Stell immer nur EINE Frage pro Nachricht
-- Sei warmherzig, aber direkt und fordernd wie ein guter Coach
-- Wenn die Antwort oberflächlich ist, hake nach
-- Verwende konkrete Zahlen aus dem Szenario wenn hilfreich
+Deine Persönlichkeit:
+- Enthusiastisch und ermutigend ("Genau der richtige Gedanke!", "Das ist eine starke Frage!")
+- Du stellst immer nur EINE Frage pro Nachricht
+- Du bist direkt aber nie belehrend
+- Maximal 120 Wörter pro Antwort
 - Sprich auf Deutsch, du-Form
-- Nach ca. 6-8 Austauschen, fasse die wichtigsten Business-Case-Elemente zusammen und empfiehl, den ROI-Kalkulator zu nutzen
-- Maximal 150 Wörter pro Antwort
+
+Das Szenario: Joey (HR Business Partnerin) hat erfahren, dass das Sales-Team ein neues Training möchte (25.000 €, Budget überschritten). Sie muss CFO und CEO überzeugen.
+
+Führe sie durch:
+1. Warum jetzt? Welches konkrete Problem lösen wir?
+2. Was passiert wenn wir NICHT investieren?
+3. Welche Infos braucht Joey noch um rechnen zu können?
+4. Welche Einwände könnte der CFO haben?
+5. Wie kommuniziert sie Gewinn statt Umsatz?
+
+Nach ca. 5-6 Austauschen: Fasse zusammen und beende mit: "Du bist bereit! Klick auf 'Weiter zum Follow-up' 🚀"
 """
 
-def get_agent_response(messages: list) -> str:
-    """Call Anthropic API for agent response."""
+def swifty_call(messages):
     try:
-        api_key = st.secrets.get("ANTHROPIC_API_KEY", "")
-        if not api_key:
+        key = st.secrets.get("ANTHROPIC_API_KEY", "")
+        if not key:
             return "⚠️ Kein API-Key konfiguriert. Bitte `ANTHROPIC_API_KEY` in den Streamlit Secrets hinterlegen."
-
-        response = requests.post(
+        r = requests.post(
             "https://api.anthropic.com/v1/messages",
-            headers={
-                "x-api-key": api_key,
-                "anthropic-version": "2023-06-01",
-                "content-type": "application/json"
-            },
-            json={
-                "model": "claude-opus-4-5",
-                "max_tokens": 400,
-                "system": AGENT_SYSTEM_PROMPT,
-                "messages": messages
-            },
+            headers={"x-api-key": key, "anthropic-version": "2023-06-01",
+                     "content-type": "application/json"},
+            json={"model": "claude-opus-4-5", "max_tokens": 300,
+                  "system": SWIFTY_SYSTEM, "messages": messages},
             timeout=30
         )
-        data = response.json()
-        if "content" in data and len(data["content"]) > 0:
-            return data["content"][0]["text"]
-        return "Entschuldigung, ich konnte keine Antwort generieren."
+        return r.json()["content"][0]["text"]
     except Exception as e:
-        return f"Verbindungsfehler: {str(e)}"
+        return f"Verbindungsfehler: {e}"
+
+
+# ─── Progress Bar ─────────────────────────────────────────────────────────────
+STEP_META = [
+    ("fa-comments",    "Das Gespräch"),
+    ("fa-code-branch", "Dein Weg"),
+    ("fa-compass",     "Vorbereitung"),
+    ("fa-handshake",   "Follow-up"),
+    ("fa-calculator",  "Kalkulator"),
+    ("fa-chart-line",  "Ergebnis"),
+]
+
+def render_progress(current):
+    dots = ""
+    for i, (icon, label) in enumerate(STEP_META, 1):
+        if i < current:
+            dot_cls, line_cls = "prog-dot-done", "prog-line-done"
+        elif i == current:
+            dot_cls, line_cls = "prog-dot-active", "prog-line-active"
+        else:
+            dot_cls, line_cls = "prog-dot-pending", "prog-line-pending"
+
+        line = f'<div class="prog-line {line_cls}"></div>' if i < len(STEP_META) else ""
+        dots += f"""
+        <div class="prog-item">
+            <div class="prog-dot {dot_cls}" title="{label}">
+                <i class="fa-solid {icon}"></i>
+            </div>
+            {line}
+        </div>"""
+
+    label_text = STEP_META[current - 1][1]
+    st.markdown(f"""
+    <div class="progress-label">
+        <i class="fa-solid fa-location-dot"></i>&nbsp;
+        Schritt {current} von {len(STEP_META)} — {label_text}
+    </div>
+    <div class="progress-steps">{dots}</div>
+    """, unsafe_allow_html=True)
+
+
+# ─── Speaker Helper ───────────────────────────────────────────────────────────
+def dialogue(speaker, text, kind="joey"):
+    """kind: joey | vl | thought"""
+    icons = {"joey": "fa-user", "vl": "fa-briefcase", "thought": "fa-ellipsis"}
+    av_cls = {"joey": "av-joey", "vl": "av-vl", "thought": "av-thought"}
+    sn_cls = {"joey": "sn-joey", "vl": "sn-vl", "thought": "sn-thought"}
+    txt_cls = "dialogue-thought" if kind == "thought" else "dialogue-text"
+    icon = icons.get(kind, "fa-user")
+    av   = av_cls.get(kind, "av-joey")
+    sn   = sn_cls.get(kind, "sn-joey")
+    return f"""
+    <div class="dialogue-box">
+        <div class="speaker-row">
+            <div class="speaker-avatar {av}"><i class="fa-solid {icon}"></i></div>
+            <div class="speaker-name {sn}">{speaker}</div>
+        </div>
+        <div class="{txt_cls}">„{text}"</div>
+    </div>"""
 
 
 # ─── Charts ───────────────────────────────────────────────────────────────────
-def make_charts(r: ROIResults, params: TrainingParameters):
-    navy, lavender, cream = "#1E2A5E", "#B8BCDE", "#F5F0E6"
-
+def make_charts(r):
+    navy, lav, cream = "#1E2A5E", "#B8BCDE", "#F5F0E6"
     fig = make_subplots(
-        rows=1, cols=3,
-        subplot_titles=("Investment vs. Jahresgewinn", "Kumulierter Gewinn (12 Monate)", "Deals: Vorher vs. Nachher"),
-        horizontal_spacing=0.1
+        rows=1, cols=2,
+        subplot_titles=("Investition vs. Jahresgewinn", "Break-even Verlauf"),
+        horizontal_spacing=0.12
     )
-
-    # 1. Bar: Investment vs Annual Gain
     fig.add_trace(go.Bar(
-        x=["💸 Investment", "📈 Jahresgewinn"],
-        y=[r.total_investment, r.annual_margin],
-        marker_color=[lavender, navy],
-        text=[f"{r.total_investment:,.0f} €", f"{r.annual_margin:,.0f} €"],
+        x=["Investition", "Jahresgewinn"],
+        y=[r["total"], r["am"]],
+        marker_color=[lav, navy],
+        text=[fmt(r["total"]), fmt(r["am"])],
         textposition="auto",
         textfont=dict(color=[navy, cream]),
-        name=""
     ), row=1, col=1)
 
-    # 2. Cumulative profit
     months = list(range(13))
-    cumulative = [-r.total_investment]
-    for _ in range(12):
-        cumulative.append(cumulative[-1] + r.monthly_margin)
+    cum = [-r["total"]]
+    for _ in range(12): cum.append(cum[-1] + r["mm"])
 
     fig.add_trace(go.Scatter(
-        x=months, y=cumulative,
-        mode="lines+markers",
+        x=months, y=cum, mode="lines+markers",
         line=dict(color=navy, width=3),
         marker=dict(color=navy, size=7),
-        fill="tozeroy",
-        fillcolor="rgba(30,42,94,0.08)",
-        name=""
+        fill="tozeroy", fillcolor="rgba(30,42,94,0.08)",
     ), row=1, col=2)
-
-    fig.add_hline(y=0, line_dash="dash", line_color="#9CA3AF",
-                  annotation_text="Break-even", row=1, col=2)
-
-    # 3. Deals comparison
-    fig.add_trace(go.Bar(
-        x=["Aktuell (15%)", f"Ziel ({params.target_close_rate}%)"],
-        y=[r.current_deals, r.target_deals],
-        marker_color=[lavender, navy],
-        text=[f"{r.current_deals:.1f}", f"{r.target_deals:.1f}"],
-        textposition="auto",
-        textfont=dict(color=[navy, cream]),
-        name=""
-    ), row=1, col=3)
+    fig.add_hline(y=0, line_dash="dash", line_color="#DC2626",
+                  annotation_text=f"  Break-even: Monat {r['pb']:.1f}",
+                  annotation_font_color="#DC2626", row=1, col=2)
 
     fig.update_layout(
-        height=360,
-        showlegend=False,
-        plot_bgcolor=cream,
-        paper_bgcolor=cream,
+        height=310, showlegend=False,
+        plot_bgcolor=cream, paper_bgcolor=cream,
         font=dict(family="DM Sans, sans-serif", color=navy),
-        margin=dict(t=50, b=20, l=20, r=20)
+        margin=dict(t=45, b=10, l=10, r=10)
     )
-    fig.update_xaxes(showgrid=False, linecolor="#E5E7EB")
-    fig.update_yaxes(showgrid=True, gridcolor="#E5E7EB", linecolor="#E5E7EB")
+    fig.update_xaxes(showgrid=False, linecolor="#EAE7DF")
+    fig.update_yaxes(showgrid=True, gridcolor="#EAE7DF", linecolor="#EAE7DF")
     return fig
 
 
-# ─── Sidebar Inputs ────────────────────────────────────────────────────────────
-def render_sidebar():
-    st.sidebar.markdown("## ROI Parameter")
-    st.sidebar.markdown("---")
-    st.sidebar.markdown("**Das Training**")
+# ═══════════════════════════════════════════════════════════════════════════════
+# STEPS
+# ═══════════════════════════════════════════════════════════════════════════════
 
-    participants = st.sidebar.number_input("Teilnehmer", min_value=1, max_value=50, value=10)
-    cost_per_person = st.sidebar.number_input("Kosten pro Person (€)", min_value=500, max_value=20000, value=2500, step=100)
-
-    st.sidebar.markdown("---")
-    st.sidebar.markdown("**Sales-Metriken**")
-
-    monthly_leads = st.sidebar.number_input("Leads pro Monat", min_value=10, max_value=1000, value=200, step=10)
-    current_rate = st.sidebar.slider("Abschlussquote aktuell (%)", 1.0, 50.0, 15.0, 0.5)
-    target_rate = st.sidebar.slider("Abschlussquote Ziel (%)", 1.0, 50.0, 25.0, 0.5)
-    deal_value = st.sidebar.number_input("Deal-Wert Ø (€)", min_value=1000, max_value=500000, value=15000, step=500)
-    margin_rate = st.sidebar.slider("Marge (%)", 5.0, 80.0, 30.0, 1.0)
-
-    with st.sidebar.expander("Erweiterte Parameter"):
-        training_days = st.number_input("Trainingstage", min_value=1, max_value=10, value=3)
-        daily_rate = st.number_input("Tagessatz Ausfall (€)", min_value=100, max_value=2000, value=400, step=50)
-
-    return TrainingParameters(
-        participants=participants,
-        cost_per_person=cost_per_person,
-        monthly_leads=monthly_leads,
-        current_close_rate=current_rate,
-        target_close_rate=target_rate,
-        deal_value=deal_value,
-        margin_rate=margin_rate,
-        training_days=training_days,
-        daily_rate=daily_rate
-    )
-
-
-# ─── Main App ─────────────────────────────────────────────────────────────────
-def main():
-    # Header
+def step1():
+    render_progress(1)
+    st.markdown('<div class="scene-header">Das Gespräch</div>', unsafe_allow_html=True)
     st.markdown("""
-    <div class="main-title">Joey's Business Case</div>
-    <div class="main-subtitle">HR loves Finance · Workshop Tool</div>
-    """, unsafe_allow_html=True)
+    <div class="scene-sub">
+        <i class="fa-regular fa-clock"></i> Montagmorgen &nbsp;·&nbsp;
+        <i class="fa-solid fa-location-dot"></i> Flur vor dem Sales-Büro
+    </div>""", unsafe_allow_html=True)
 
-    # Sidebar
-    params = render_sidebar()
-    calc = SalesROICalculator()
-    r = calc.calculate(params)
+    st.markdown("""
+    <div class="dialogue-box" style="border-left: 3px solid #E5E1D8;">
+        <div style="font-size:0.85rem; color:#9CA3AF; font-style:italic; line-height:1.7;">
+            <i class="fa-solid fa-film" style="margin-right:0.4rem;"></i>
+            Joey ist auf dem Weg zum Drucker, als sie Thomas, den Vertriebsleiter,
+            mit dem Telefon am Ohr vorbeirennen sieht. Er winkt sie heran.
+        </div>
+    </div>""", unsafe_allow_html=True)
 
-    # Tabs
-    tab1, tab2, tab3 = st.tabs([
-        "📋  Das Szenario",
-        "🤖  Business Case Begleiter",
-        "🔢  ROI Kalkulator"
-    ])
+    st.markdown(dialogue("Thomas — Vertriebsleiter",
+        "Joey, kurz — ich hab gerade eine Anfrage von Consilium Training. "
+        "Die haben ein neues Sales-Programm, das ist wirklich stark. "
+        "Drei Tage, die ganze Truppe durch. Der Anbieter sagt, andere Unternehmen "
+        "haben ihre Abschlussquote damit von 15 auf 25 Prozent gesteigert.", "vl"),
+        unsafe_allow_html=True)
 
-    # ── Tab 1: Szenario ────────────────────────────────────────────────────────
-    with tab1:
-        col_left, col_right = st.columns([3, 2], gap="large")
+    st.markdown(dialogue("Joey", "Klingt interessant. Was kostet das?", "joey"),
+        unsafe_allow_html=True)
 
-        with col_left:
-            st.markdown("""
-            <div class="scenario-box">
-                <h2>Die Protagonistin</h2>
-                <p>Joey ist eine <strong>proaktive HR Business Partnerin</strong>. Sie hört zu, erkennt Muster und ergreift die Initiative, um das Business voranzubringen. Anstatt nur Budgets zu verwalten, will sie <strong>Wert schaffen</strong>.</p>
-            </div>
-            """, unsafe_allow_html=True)
+    st.markdown(dialogue("Thomas",
+        "2.500 € pro Person. Wir wären zehn Leute — also 25.000 €. "
+        "Ich weiß, das übersteigt unser genehmigtes Trainingsbudget. "
+        "Aber ich glaube wirklich daran. Kannst du das irgendwie durchkriegen?", "vl"),
+        unsafe_allow_html=True)
 
-            st.markdown("""
-            <div class="scenario-box" style="margin-top: 1rem;">
-                <h2>Die Herausforderung</h2>
-                <p>Das Sales-Team stagniert bei einer <strong>Abschlussquote von 15%</strong>. Eine neue Trainingsmethode könnte die Quote auf <strong>25%</strong> heben – aber die Investition von <strong>25.000 €</strong> übersteigt das genehmigte Budget.</p>
-                <p style="margin-top: 0.8rem;">Der CFO und CEO müssen überzeugt werden – und das schnell, denn <strong>der Wettbewerb schläft nicht.</strong></p>
-                <p style="margin-top: 0.8rem; font-style: italic; color: #B8BCDE;">Joey nimmt sich der Sache an.</p>
-            </div>
-            """, unsafe_allow_html=True)
+    st.markdown(dialogue("Joey — innerlich",
+        "Okay. Thomas glaubt daran — das ist ein gutes Zeichen. Aber der CFO wird Zahlen sehen wollen. "
+        "Echte Zahlen. Nicht Versprechen vom Anbieter. Ich muss das durchdenken, "
+        "bevor ich irgendwo anklopfe.", "thought"),
+        unsafe_allow_html=True)
 
-        with col_right:
-            st.markdown("""
-            <div class="mission-box">
-                <h3>🎯 Deine Mission</h3>
-                <p style="color: #1E2A5E; font-size: 0.9rem; margin-bottom: 0.6rem;">Versetze dich in die Rolle von Joey. Entwickle eine überzeugende, datengestützte Argumentation für die Geschäftsführung.</p>
-                <ul>
-                    <li>Nutze den ROI-Rechner mit den genannten Werten</li>
-                    <li>Ermittle den zusätzlichen <strong>Gewinn</strong> (nicht nur Umsatz!) nach 12 Monaten</li>
-                    <li><em>Bonus:</em> Was ändert sich bei nur 20% Abschlussquote?</li>
-                </ul>
-            </div>
-            """, unsafe_allow_html=True)
+    st.markdown(dialogue("Joey",
+        "Ich schaue mir das an, Thomas. Gib mir bis Mittwoch.", "joey"),
+        unsafe_allow_html=True)
 
-            st.markdown("**Leitfragen für deine Argumentation**")
+    st.markdown("<br>", unsafe_allow_html=True)
+    if st.button("Weiter  →  Was macht Joey jetzt?"):
+        st.session_state.step = 2
+        st.rerun()
 
-            questions = [
-                "Wie hoch ist der ROI nach einem Jahr?",
-                "Nach wie vielen Monaten amortisiert sich die Investition?",
-                "Was ist das finanzielle Risiko beim Status quo?",
-                "Bonus: Wie sieht der Business Case bei nur 20% Abschlussquote aus?"
-            ]
-            for q in questions:
-                st.markdown(f'<div class="leitfrage">❓ {q}</div>', unsafe_allow_html=True)
 
-    # ── Tab 2: AI Agent ────────────────────────────────────────────────────────
-    with tab2:
+def step2():
+    render_progress(2)
+    st.markdown('<div class="scene-header">Joeys nächster Schritt</div>', unsafe_allow_html=True)
+
+    st.markdown(dialogue("Joey — innerlich",
+        "Ich muss einen Business Case bauen. Aber wo fange ich an? "
+        "Welche Fragen muss ich mir überhaupt stellen — bevor ich auch nur "
+        "eine Zahl in den Rechner eingebe?", "thought"),
+        unsafe_allow_html=True)
+
+    st.markdown('<div class="choice-title">Wie willst du vorgehen?</div>', unsafe_allow_html=True)
+
+    col1, col2 = st.columns(2, gap="large")
+
+    with col1:
         st.markdown("""
-        <div style="background: #1E2A5E; border-radius: 12px; padding: 1.2rem 1.6rem; margin-bottom: 1.5rem; color: #F5F0E6;">
-            <strong style="font-family: 'DM Serif Display', serif; font-size: 1.1rem;">Business Case Begleiter</strong><br>
-            <span style="font-size: 0.88rem; color: #B8BCDE;">Ich führe dich Schritt für Schritt durch das Business-Case-Denken — bevor du zum Kalkulator gehst.</span>
+        <div class="choice-card-navy">
+            <div class="choice-icon ci-navy">
+                <i class="fa-solid fa-robot"></i>
+            </div>
+            <h3>Ich brauche Swifty's Hilfe</h3>
+            <p>Swifty führt dich durch die wichtigen Fragen,
+            die du dir stellen musst — bevor du zum Kalkulator gehst.
+            Schritt für Schritt, mit Coaching.</p>
         </div>
         """, unsafe_allow_html=True)
-
-        # Session state init
-        if "agent_messages" not in st.session_state:
-            st.session_state.agent_messages = []
-            # Initial greeting
+        if st.button("Mit Swifty starten", key="btn_swifty"):
+            st.session_state.path = "swifty"
+            st.session_state.step = 3
             opening = (
-                "Hallo! Schön, dass du hier bist. Bevor wir zu den Zahlen kommen, "
-                "möchte ich mit dir eine Frage stellen, die viele überspringen — "
-                "und die doch die wichtigste ist:\n\n"
-                "**Warum investieren wir hier – und warum jetzt?**\n\n"
-                "Was ist das konkrete Problem, das ihr lösen wollt?"
+                "Hey Joey — super, dass du dir die Zeit nimmst, das wirklich durchzudenken! 🎉\n\n"
+                "Bevor wir zu den Zahlen kommen, lass uns bei der wichtigsten Frage beginnen — "
+                "die viele überspringen:\n\n"
+                "**Welches konkrete Problem hat das Sales-Team gerade?** "
+                "Was steckt hinter der stagnierenden Abschlussquote?"
             )
-            st.session_state.agent_messages.append({
-                "role": "assistant", "content": opening
-            })
-
-        # Display conversation
-        for msg in st.session_state.agent_messages:
-            if msg["role"] == "assistant":
-                st.markdown(f'<div class="chat-agent">🤖 {msg["content"]}</div>', unsafe_allow_html=True)
-            else:
-                st.markdown(f'<div class="chat-user">{msg["content"]}</div>', unsafe_allow_html=True)
-
-        # Input
-        user_input = st.chat_input("Deine Antwort …")
-        if user_input:
-            st.session_state.agent_messages.append({"role": "user", "content": user_input})
-
-            # Build message history for API (only user/assistant alternating)
-            api_messages = [
-                {"role": m["role"], "content": m["content"]}
-                for m in st.session_state.agent_messages
-            ]
-
-            with st.spinner(""):
-                response = get_agent_response(api_messages)
-
-            st.session_state.agent_messages.append({"role": "assistant", "content": response})
+            st.session_state.swifty_messages = [{"role": "assistant", "content": opening}]
             st.rerun()
 
-        col_r, col_l = st.columns([1, 4])
-        with col_r:
-            if st.button("🔄 Neu starten"):
-                st.session_state.agent_messages = []
+    with col2:
+        st.markdown("""
+        <div class="choice-card-light">
+            <div class="choice-icon ci-light">
+                <i class="fa-solid fa-pen-to-square"></i>
+            </div>
+            <h3>Ich weiß schon was ich fragen will</h3>
+            <p>Du kennst dein Handwerk. Überprüfe deine
+            Vorbereitungs-Checkliste und geh direkt zum
+            Follow-up-Gespräch mit Thomas.</p>
+        </div>
+        """, unsafe_allow_html=True)
+        if st.button("Direkt zur Checkliste", key="btn_fast"):
+            st.session_state.path = "fast"
+            st.session_state.step = 3
+            st.rerun()
+
+
+def step3():
+    render_progress(3)
+
+    if st.session_state.path == "swifty":
+        st.markdown('<div class="scene-header">Vorbereitung mit Swifty</div>', unsafe_allow_html=True)
+        st.markdown("""
+        <div class="swifty-header">
+            <div class="swifty-avatar"><i class="fa-solid fa-robot"></i></div>
+            <div>
+                <div class="swifty-label">Swifty · Business-Case-Coach</div>
+                <div style="font-size:0.8rem; color:#6B7280;">Motivierender Coach · immer eine Frage</div>
+            </div>
+        </div>""", unsafe_allow_html=True)
+
+        for msg in st.session_state.swifty_messages:
+            if msg["role"] == "assistant":
+                st.markdown(f'<div class="swifty-bubble">{msg["content"]}</div>',
+                            unsafe_allow_html=True)
+            else:
+                st.markdown(f'<div class="user-bubble">{msg["content"]}</div>',
+                            unsafe_allow_html=True)
+
+        last = st.session_state.swifty_messages[-1]["content"] if st.session_state.swifty_messages else ""
+        if "Du bist bereit" in last or "bereit!" in last:
+            st.markdown("<br>", unsafe_allow_html=True)
+            if st.button("Weiter zum Follow-up-Gespräch  →"):
+                st.session_state.step = 4
+                st.rerun()
+        else:
+            user_input = st.chat_input("Deine Antwort an Swifty …")
+            if user_input:
+                st.session_state.swifty_messages.append({"role": "user", "content": user_input})
+                with st.spinner("Swifty denkt …"):
+                    resp = swifty_call(st.session_state.swifty_messages)
+                st.session_state.swifty_messages.append({"role": "assistant", "content": resp})
                 st.rerun()
 
-    # ── Tab 3: ROI Kalkulator ──────────────────────────────────────────────────
-    with tab3:
+        col_skip, _ = st.columns([1, 5])
+        with col_skip:
+            if st.button("Überspringen →"):
+                st.session_state.step = 4
+                st.rerun()
 
-        # KPI Row
-        c1, c2, c3, c4, c5 = st.columns(5)
-        kpis = [
-            ("Gesamtinvestition", calc.fmt(r.total_investment), "direkte + Ausfallkosten"),
-            ("Mehrumsatz / Monat", calc.fmt(r.monthly_revenue), f"{r.additional_deals:.1f} zusätzl. Deals"),
-            ("Zusatzgewinn / Monat", calc.fmt(r.monthly_margin), f"{params.margin_rate}% Marge"),
-            ("Jahresgewinn", calc.fmt(r.annual_margin), "nach 12 Monaten"),
-            ("Payback", f"{r.payback_months:.1f} Mon.", f"ROI: {r.roi_percentage:.0f}%"),
+    else:
+        st.markdown('<div class="scene-header">Deine Vorbereitungs-Checkliste</div>', unsafe_allow_html=True)
+        st.markdown("""
+        <div class="scene-sub">
+            <i class="fa-solid fa-list-check"></i>
+            Was Joey klären muss — bevor sie rechnet
+        </div>""", unsafe_allow_html=True)
+
+        items = [
+            ("fa-circle-question", "Warum jetzt?",
+             "Das Sales-Team stagniert seit Q3 bei 15%. Thomas hat konkrete Marktdaten."),
+            ("fa-triangle-exclamation", "Was passiert bei Nicht-Investition?",
+             "Entgangener Gewinn jeden Monat — der Status quo ist nicht kostenlos."),
+            ("fa-table-list", "Welche Zahlen brauche ich?",
+             "Leads/Monat, Deal-Wert, Marge pro Abschluss, Teilnehmerzahl, Ausfallkosten."),
+            ("fa-shield-halved", "Warum glaube ich, dass das Training wirkt?",
+             "Anbieter-Referenzen, vergleichbare Unternehmen — kein Versprechen, Daten."),
+            ("fa-comments-dollar", "Welche Einwände wird der CFO haben?",
+             "'Woher wissen wir, dass die Quote wirklich steigt?' — Antwort vorbereiten."),
+            ("fa-coins", "Gewinn statt Umsatz kommunizieren",
+             "Nicht Mehrumsatz, sondern zusätzlicher Deckungsbeitrag ist das Argument."),
+            ("fa-down-left-and-up-right-to-center", "Konservatives Szenario vorbereiten",
+             "Was wenn's nur 20% statt 25% werden? Ist der Business Case noch positiv?"),
         ]
-        for col, (label, value, sub) in zip([c1, c2, c3, c4, c5], kpis):
-            with col:
-                st.markdown(f"""
-                <div class="kpi-card">
-                    <div class="kpi-label">{label}</div>
-                    <div class="kpi-value">{value}</div>
-                    <div class="kpi-sub">{sub}</div>
+
+        for icon, title, detail in items:
+            st.markdown(f"""
+            <div class="check-item">
+                <div class="check-icon-wrap">
+                    <i class="fa-solid {icon}" style="font-size:0.75rem; color:#059669;"></i>
                 </div>
-                """, unsafe_allow_html=True)
+                <div>
+                    <strong style="color:#1E2A5E;">{title}</strong><br>
+                    <span style="color:#6B7280; font-size:0.87rem;">{detail}</span>
+                </div>
+            </div>""", unsafe_allow_html=True)
 
-        st.markdown("<hr class='navy-divider'>", unsafe_allow_html=True)
-
-        # Recommendation
-        if r.roi_percentage > 100 and r.payback_months < 6:
-            st.markdown(f"""
-            <div class="rec-success">
-                <strong>✅ Klare Empfehlung: Training durchführen!</strong><br>
-                ROI von <strong>{r.roi_percentage:.0f}%</strong> — Payback in nur <strong>{r.payback_months:.1f} Monaten</strong>.
-                Jeder investierte Euro bringt <strong>{r.roi_multiple + 1:.1f} € zurück</strong>.
-                Das ist eine starke Grundlage für den Business Case.
-            </div>
-            """, unsafe_allow_html=True)
-        elif r.roi_percentage > 30:
-            st.markdown(f"""
-            <div class="rec-warning">
-                <strong>👍 Training lohnt sich — Argumentation schärfen.</strong><br>
-                ROI von <strong>{r.roi_percentage:.0f}%</strong>, Payback in <strong>{r.payback_months:.1f} Monaten</strong>.
-                Prüfe deine Annahmen zur Marge und Conversion.
-            </div>
-            """, unsafe_allow_html=True)
-        else:
-            st.markdown(f"""
-            <div style="background:#FEE2E2; border-left:4px solid #DC2626; border-radius:8px; padding:1rem 1.4rem; color:#7F1D1D;">
-                <strong>⚠️ Vorsicht: ROI zu niedrig für Budgetüberschreitung.</strong><br>
-                ROI von <strong>{r.roi_percentage:.0f}%</strong>. Überprüfe Parameter oder suche Alternativen.
-            </div>
-            """, unsafe_allow_html=True)
-
-        # Charts
         st.markdown("<br>", unsafe_allow_html=True)
-        st.plotly_chart(make_charts(r, params), use_container_width=True)
+        if st.button("Weiter zum Follow-up-Gespräch  →"):
+            st.session_state.step = 4
+            st.rerun()
 
-        # Detailed Breakdown & Scenarios
-        st.markdown("<hr class='navy-divider'>", unsafe_allow_html=True)
 
-        s_tab1, s_tab2, s_tab3 = st.tabs(["📐 Kalkulation", "🔍 Szenarien", "💼 CFO Argumente"])
-
-        with s_tab1:
-            col_a, col_b = st.columns(2)
-            with col_a:
-                st.markdown(f"""
-                **Investment-Aufbau**
-                - Trainingskosten: {params.participants} × {calc.fmt(params.cost_per_person)} = **{calc.fmt(r.training_costs)}**
-                - Ausfallkosten: {params.participants} × {params.training_days} Tage × {params.daily_rate} € = **{calc.fmt(r.opportunity_costs)}**
-                - **Gesamtinvestition: {calc.fmt(r.total_investment)}**
-
-                **Deal-Steigerung**
-                - Aktuell: {params.monthly_leads} × {params.current_close_rate}% = **{r.current_deals:.1f} Deals/Monat**
-                - Ziel: {params.monthly_leads} × {params.target_close_rate}% = **{r.target_deals:.1f} Deals/Monat**
-                - Zusätzlich: **+{r.additional_deals:.1f} Deals/Monat**
-                """)
-            with col_b:
-                st.markdown(f"""
-                **Gewinn-Berechnung**
-                - Mehrumsatz: {r.additional_deals:.1f} × {calc.fmt(params.deal_value)} = **{calc.fmt(r.monthly_revenue)}/Monat**
-                - Monatsmarge: {calc.fmt(r.monthly_revenue)} × {params.margin_rate}% = **{calc.fmt(r.monthly_margin)}/Monat**
-                - **Jahresgewinn: {calc.fmt(r.annual_margin)}**
-
-                **ROI-Metriken**
-                - Nettogewinn: {calc.fmt(r.annual_margin)} − {calc.fmt(r.total_investment)} = **{calc.fmt(r.net_benefit)}**
-                - ROI: **{r.roi_percentage:.0f}%**
-                - Payback: **{r.payback_months:.1f} Monate**
-                """)
-
-        with s_tab2:
-            col_cons, col_real, col_bonus = st.columns(3)
-            # Conservative: only 20% close rate
-            cons_deals = params.monthly_leads * 0.20 - r.current_deals
-            cons_margin = cons_deals * params.deal_value * (params.margin_rate / 100) * 12
-            cons_roi = ((cons_margin - r.total_investment) / r.total_investment) * 100
-
-            with col_cons:
-                st.markdown(f"""
-                **🔵 Konservativ (20%)**
-                Abschlussquote nur auf 20%
-
-                - Zusatzgewinn/Jahr: **{calc.fmt(cons_margin)}**
-                - ROI: **{cons_roi:.0f}%**
-                - Payback: **{(r.total_investment / (cons_deals * params.deal_value * params.margin_rate / 100)):.1f} Monate**
-
-                *Auch hier: Investition lohnt sich.*
-                """)
-            with col_real:
-                st.markdown(f"""
-                **🟢 Realistisch (25%)**
-                Abschlussquote auf {params.target_close_rate}%
-
-                - Zusatzgewinn/Jahr: **{calc.fmt(r.annual_margin)}**
-                - ROI: **{r.roi_percentage:.0f}%**
-                - Payback: **{r.payback_months:.1f} Monate**
-
-                *Das ist der Basisfall.*
-                """)
-
-            best_margin = r.monthly_margin * 1.25 * 12
-            best_roi = ((best_margin - r.total_investment) / r.total_investment) * 100
-            with col_bonus:
-                st.markdown(f"""
-                **🟡 Optimistisch (+25%)**
-                Training wirkt besser als erwartet
-
-                - Zusatzgewinn/Jahr: **{calc.fmt(best_margin)}**
-                - ROI: **{best_roi:.0f}%**
-                - Payback: **< {r.payback_months * 0.8:.1f} Monate**
-
-                *Upside für die Argumentation.*
-                """)
-
-        with s_tab3:
-            st.markdown(f"""
-            **Top-Argumente für CFO & CEO**
-
-            1. **Gewinn-Fokus** — Das Training generiert **{calc.fmt(r.annual_margin)} zusätzlichen Jahresgewinn** — das ist echtes Geld in der Kasse, kein Umsatzversprechen.
-
-            2. **Schnelle Amortisation** — Die Investition zahlt sich in **{r.payback_months:.1f} Monaten** zurück. Schneller als jede Software-Einführung.
-
-            3. **Opportunitätskosten** — Jeder Monat Verzögerung kostet uns **{calc.fmt(r.monthly_margin)}** entgangenen Gewinn. Der Status quo ist nicht kostenlos.
-
-            4. **Downside ist begrenzt** — Selbst wenn das Training nur die Hälfte bringt: **{calc.fmt(r.annual_margin * 0.5)}** Jahresgewinn bei **{calc.fmt(r.total_investment)}** Einsatz ist noch immer positiv.
-
-            5. **Marge als Hebel** — Wir reden nicht über Umsatz. Jeder zusätzliche Deal bringt **{calc.fmt(params.deal_value * params.margin_rate / 100)} echten Gewinn** — dauerhaft.
-            """)
-
-        # Export
-        st.markdown("<hr class='navy-divider'>", unsafe_allow_html=True)
-        export_data = {
-            "timestamp": datetime.now().isoformat(),
-            "scenario": "Joey — HR Business Case Sales Training",
-            "parameters": {
-                "participants": params.participants,
-                "cost_per_person": params.cost_per_person,
-                "monthly_leads": params.monthly_leads,
-                "current_close_rate": params.current_close_rate,
-                "target_close_rate": params.target_close_rate,
-                "deal_value": params.deal_value,
-                "margin_rate": params.margin_rate
-            },
-            "results": {
-                "total_investment": r.total_investment,
-                "monthly_margin": r.monthly_margin,
-                "annual_margin": r.annual_margin,
-                "roi_percentage": r.roi_percentage,
-                "payback_months": r.payback_months
-            }
-        }
-        col_dl1, col_dl2, _ = st.columns([1, 1, 3])
-        with col_dl1:
-            st.download_button(
-                "⬇️ JSON Export",
-                data=json.dumps(export_data, indent=2, ensure_ascii=False),
-                file_name=f"joey_roi_{datetime.now().strftime('%Y%m%d_%H%M')}.json",
-                mime="application/json"
-            )
-        with col_dl2:
-            summary_txt = f"""Joey's Business Case — Sales Training ROI
-Erstellt: {datetime.now().strftime('%d.%m.%Y %H:%M')}
-
-PARAMETER
----------
-Teilnehmer:         {params.participants}
-Kosten/Person:      {calc.fmt(params.cost_per_person)}
-Leads/Monat:        {params.monthly_leads}
-Quote aktuell:      {params.current_close_rate}%
-Quote Ziel:         {params.target_close_rate}%
-Deal-Wert:          {calc.fmt(params.deal_value)}
-Marge:              {params.margin_rate}%
-
-ERGEBNISSE
-----------
-Gesamtinvestition:  {calc.fmt(r.total_investment)}
-Zusatzgewinn/Monat: {calc.fmt(r.monthly_margin)}
-Jahresgewinn:       {calc.fmt(r.annual_margin)}
-ROI:                {r.roi_percentage:.0f}%
-Payback:            {r.payback_months:.1f} Monate
-"""
-            st.download_button(
-                "⬇️ Text Export",
-                data=summary_txt,
-                file_name=f"joey_roi_{datetime.now().strftime('%Y%m%d_%H%M')}.txt",
-                mime="text/plain"
-            )
-
-    # Footer
+def step4():
+    render_progress(4)
+    st.markdown('<div class="scene-header">Das Follow-up</div>', unsafe_allow_html=True)
     st.markdown("""
-    <div style="margin-top: 3rem; padding-top: 1rem; border-top: 1px solid #D1D5DB;
-                text-align: center; color: #9CA3AF; font-size: 0.78rem;">
-        HR loves Finance · Anne Schuster Consulting · anneschuster.com
+    <div class="scene-sub">
+        <i class="fa-regular fa-clock"></i> Mittwoch · 10:15 Uhr &nbsp;·&nbsp;
+        <i class="fa-solid fa-location-dot"></i> Joeys Büro
+    </div>""", unsafe_allow_html=True)
+
+    st.markdown("""
+    <div class="dialogue-box" style="border-left: 3px solid #E5E1D8;">
+        <div style="font-size:0.85rem; color:#9CA3AF; font-style:italic; line-height:1.7;">
+            <i class="fa-solid fa-film" style="margin-right:0.4rem;"></i>
+            Joey hat Thomas zu sich gebeten. Sie hat einen Notizblock vor sich —
+            keine Zahlen, nur Fragen. Genau so, wie es sein sollte.
+        </div>
+    </div>""", unsafe_allow_html=True)
+
+    exchanges = [
+        ("joey", "Joey",
+         "Thomas, bevor ich das intern weitertrage, brauche ich ein paar Zahlen von dir. "
+         "Ich will sichergehen, dass wir das wirklich durchgerechnet haben — "
+         "nicht nur das Versprechen des Anbieters."),
+        ("vl", "Thomas", "Klar, frag mich alles."),
+        ("joey", "Joey", "Wie viele Leads habt ihr aktuell pro Monat?"),
+        ("vl", "Thomas", "Ungefähr 200. Manchmal mehr, selten weniger."),
+        ("joey", "Joey", "Und der durchschnittliche Deal-Wert — wenn ein Lead abschließt?"),
+        ("vl", "Thomas", "15.000 €. Kann variieren, aber das ist ein realistischer Durchschnitt."),
+        ("joey", "Joey", "Was ist eure Marge auf so einen Deal?"),
+        ("vl", "Thomas", "Etwa 25%. Nach Kosten, versteht sich."),
+        ("joey", "Joey", "Und ihr seid aktuell wirklich bei 15% Abschlussquote?"),
+        ("vl", "Thomas", "Leider ja. War mal besser. Deshalb brauchen wir das Training."),
+        ("joey", "Joey",
+         "Letzte Frage: Woher weiß ich, dass 25% realistisch ist — und kein Anbieterversprechen?"),
+        ("vl", "Thomas",
+         "Wir haben zwei Referenzkunden bekommen. Beide haben nach dem Training zwischen 22 und 28% "
+         "erreicht. Ich kann dir die Kontakte geben."),
+        ("thought", "Joey — innerlich",
+         "Gut. Ich hab alles was ich brauche. Jetzt rechne ich."),
+    ]
+
+    for kind, speaker, text in exchanges:
+        st.markdown(dialogue(speaker, text, kind), unsafe_allow_html=True)
+
+    st.markdown("<br>", unsafe_allow_html=True)
+    if st.button("Weiter zum Kalkulator  →"):
+        st.session_state.step = 5
+        st.rerun()
+
+
+def step5():
+    render_progress(5)
+    st.markdown('<div class="scene-header">Der Kalkulator</div>', unsafe_allow_html=True)
+    st.markdown("""
+    <div class="scene-sub">
+        <i class="fa-solid fa-calculator"></i>
+        Joey rechnet — mit den Zahlen aus dem Gespräch
+    </div>""", unsafe_allow_html=True)
+
+    st.markdown(dialogue("Joey — innerlich",
+        "Die Zahlen sind da. Jetzt muss ich aus Umsatz Gewinn machen — "
+        "das ist was den CFO interessiert. Nicht was wir verkaufen könnten, "
+        "sondern was wirklich in der Kasse landet.", "thought"),
+        unsafe_allow_html=True)
+
+    st.markdown("<hr>", unsafe_allow_html=True)
+
+    col_l, col_r = st.columns(2, gap="large")
+    with col_l:
+        st.markdown("**<i class='fa-solid fa-graduation-cap'></i>&nbsp; Das Training**",
+                    unsafe_allow_html=True)
+        participants  = st.number_input("Teilnehmer", 1, 50, 10)
+        cost_pp       = st.number_input("Kosten pro Person (€)", 500, 20000, 2500, 100)
+        t_days        = st.number_input("Trainingstage", 1, 10, 3)
+        daily_rate    = st.number_input("Tagessatz Ausfall/MA (€)", 100, 2000, 400, 50)
+
+    with col_r:
+        st.markdown("**<i class='fa-solid fa-chart-bar'></i>&nbsp; Sales-Metriken — aus dem Gespräch**",
+                    unsafe_allow_html=True)
+        leads         = st.number_input("Leads pro Monat", 10, 1000, 200, 10)
+        curr_rate     = st.slider("Abschlussquote aktuell (%)", 1.0, 50.0, 15.0, 0.5)
+        tgt_rate      = st.slider("Abschlussquote Ziel (%)", 1.0, 50.0, 25.0, 0.5)
+        deal_val      = st.number_input("Ø Deal-Wert (€)", 1000, 500000, 15000, 500)
+        margin        = st.slider("Marge pro Deal (%)", 5.0, 80.0, 25.0, 1.0)
+
+    p = Params(participants, cost_pp, leads, curr_rate, tgt_rate, deal_val, margin, t_days, daily_rate)
+    r = calculate(p)
+    st.session_state.params = p
+    st.session_state.results = r
+
+    st.markdown("<hr>", unsafe_allow_html=True)
+
+    kpis = [
+        ("fa-money-bill-wave",  "Gesamtinvestition", fmt(r["total"]),     "Training + Ausfallzeit"),
+        ("fa-arrow-trend-up",   "Zusatzgewinn/Mo.",  fmt(r["mm"]),         f"+{r['ad']:.1f} Deals × {margin}%"),
+        ("fa-sack-dollar",      "Jahresgewinn",      fmt(r["am"]),         "nach 12 Monaten"),
+        ("fa-percent",          "ROI",               f"{r['roi']:.0f}%",   fmt(r["net"]) + " Nettogewinn"),
+        ("fa-hourglass-half",   "Payback",           f"{r['pb']:.1f} Mon.", "bis Break-even"),
+    ]
+
+    kpi_html = '<div class="kpi-grid">'
+    for icon, label, value, sub in kpis:
+        kpi_html += f"""
+        <div class="kpi-card">
+            <div class="kpi-icon"><i class="fa-solid {icon}"></i></div>
+            <div class="kpi-label">{label}</div>
+            <div class="kpi-value">{value}</div>
+            <div class="kpi-sub">{sub}</div>
+        </div>"""
+    kpi_html += "</div>"
+    st.markdown(kpi_html, unsafe_allow_html=True)
+
+    st.plotly_chart(make_charts(r), use_container_width=True)
+
+    st.markdown("<br>", unsafe_allow_html=True)
+    if st.button("Weiter zur Argumentation  →"):
+        st.session_state.step = 6
+        st.rerun()
+
+
+def step6():
+    render_progress(6)
+    r = st.session_state.results
+    p = st.session_state.params
+
+    if not r or not p:
+        st.warning("Bitte zuerst den Kalkulator ausfüllen.")
+        if st.button("← Zurück"):
+            st.session_state.step = 5
+            st.rerun()
+        return
+
+    st.markdown('<div class="scene-header">Joeys Business Case</div>', unsafe_allow_html=True)
+    st.markdown("""
+    <div class="scene-sub">
+        <i class="fa-solid fa-chart-line"></i> Bereit für CFO &amp; CEO
+    </div>""", unsafe_allow_html=True)
+
+    if r["roi"] > 80 and r["pb"] < 6:
+        st.markdown(f"""
+        <div class="rec-success">
+            <i class="fa-solid fa-circle-check"></i>
+            <div>
+                <strong>Starker Business Case — Investition klar empfehlenswert.</strong><br>
+                ROI von <strong>{r['roi']:.0f}%</strong> &nbsp;·&nbsp;
+                Payback in <strong>{r['pb']:.1f} Monaten</strong> &nbsp;·&nbsp;
+                Jahresgewinn <strong>{fmt(r['am'])}</strong>
+            </div>
+        </div>""", unsafe_allow_html=True)
+    else:
+        st.markdown(f"""
+        <div class="rec-warn">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+            <div>
+                <strong>Positiver Business Case — Argumentation schärfen.</strong><br>
+                ROI von <strong>{r['roi']:.0f}%</strong> &nbsp;·&nbsp;
+                Prüfe Annahmen zur Marge und Conversion.
+            </div>
+        </div>""", unsafe_allow_html=True)
+
+    st.markdown("<hr>", unsafe_allow_html=True)
+    col1, col2 = st.columns(2, gap="large")
+
+    with col1:
+        st.markdown("**<i class='fa-solid fa-person-chalkboard'></i>&nbsp; Schlagkräftige Argumente**",
+                    unsafe_allow_html=True)
+        args = [
+            ("fa-sack-dollar",      "Gewinn, nicht Umsatz",
+             f"Das Training generiert {fmt(r['am'])} zusätzlichen Jahresgewinn — "
+             "kein Umsatzversprechen, sondern echter Deckungsbeitrag."),
+            ("fa-clock-rotate-left","Schnelle Amortisation",
+             f"Die Investition zahlt sich in {r['pb']:.1f} Monaten zurück — "
+             "schneller als jede Software-Einführung."),
+            ("fa-fire",             "Opportunitätskosten des Abwartens",
+             f"Jeder Monat ohne Training kostet {fmt(r['mm'])} entgangenen Gewinn. "
+             "Nichts-Tun ist nicht kostenlos."),
+            ("fa-shield",           "Begrenzter Downside",
+             f"Selbst bei nur 20% Abschlussquote bleibt der ROI positiv. "
+             "Das Risiko ist asymmetrisch."),
+            ("fa-star",             "Referenzen statt Versprechen",
+             "Zwei Kunden des Anbieters haben 22–28% erreicht. "
+             "Das sind Marktdaten, kein Anbieter-Pitch."),
+        ]
+        for icon, title, text in args:
+            st.markdown(f"""
+            <div class="arg-item">
+                <div class="arg-icon-wrap">
+                    <i class="fa-solid {icon}" style="font-size:0.72rem; color:#1E2A5E;"></i>
+                </div>
+                <div>
+                    <strong style="color:#1E2A5E;">{title}</strong><br>
+                    <span style="color:#6B7280; font-size:0.87rem;">{text}</span>
+                </div>
+            </div>""", unsafe_allow_html=True)
+
+    with col2:
+        st.markdown("**<i class='fa-solid fa-sliders'></i>&nbsp; Szenarien im Vergleich**",
+                    unsafe_allow_html=True)
+
+        cons_ad = p.monthly_leads * 0.20 - (p.monthly_leads * p.current_rate / 100)
+        cons_am = cons_ad * p.deal_value * (p.margin_rate / 100) * 12
+        cons_roi = ((cons_am - r["total"]) / r["total"]) * 100
+
+        scenarios = [
+            ("fa-circle", "badge-cons", "KONSERVATIV", "20% Abschlussquote",
+             fmt(cons_am), f"{cons_roi:.0f}%"),
+            ("fa-circle", "badge-real", "REALISTISCH", f"{p.target_rate}% Abschlussquote",
+             fmt(r["am"]), f"{r['roi']:.0f}%"),
+            ("fa-circle", "badge-opt",  "OPTIMISTISCH", "+25% über Ziel",
+             fmt(r["am"] * 1.25), f"{((r['am']*1.25 - r['total'])/r['total']*100):.0f}%"),
+        ]
+        for icon, badge, label, sublabel, jahresgewinn, roi_v in scenarios:
+            st.markdown(f"""
+            <div class="scenario-tile">
+                <div class="s-badge {badge}">
+                    <i class="fa-solid {icon}"></i> {label}
+                    <span style="color:#9CA3AF; font-weight:400;">&nbsp;— {sublabel}</span>
+                </div>
+                <div style="font-size:0.87rem; color:#6B7280;">
+                    Jahresgewinn: <strong style="color:#1E2A5E;">{jahresgewinn}</strong>
+                    &nbsp;·&nbsp; ROI: <strong style="color:#1E2A5E;">{roi_v}</strong>
+                </div>
+            </div>""", unsafe_allow_html=True)
+
+        st.markdown("<br>", unsafe_allow_html=True)
+        st.markdown("**<i class='fa-solid fa-magnifying-glass-chart'></i>&nbsp; Die Kalkulation**",
+                    unsafe_allow_html=True)
+        st.markdown(f"""
+        <div class="calc-detail">
+            <i class="fa-solid fa-circle-dot" style="color:#B8BCDE; font-size:0.6rem;"></i>
+            Trainingskosten: {p.participants} × {fmt(p.cost_per_person)} = <strong>{fmt(r['tc'])}</strong><br>
+            <i class="fa-solid fa-circle-dot" style="color:#B8BCDE; font-size:0.6rem;"></i>
+            Ausfallkosten: {p.participants} × {p.training_days}d × {p.daily_rate}€ = <strong>{fmt(r['oc'])}</strong><br>
+            <i class="fa-solid fa-circle-dot" style="color:#1E2A5E; font-size:0.6rem;"></i>
+            <strong>Gesamtinvestition: {fmt(r['total'])}</strong><br><br>
+            <i class="fa-solid fa-circle-dot" style="color:#B8BCDE; font-size:0.6rem;"></i>
+            Zusätzliche Deals: {r['ad']:.1f}/Mo. × {fmt(p.deal_value)} × {p.margin_rate}%<br>
+            <i class="fa-solid fa-circle-dot" style="color:#1E2A5E; font-size:0.6rem;"></i>
+            <strong>= {fmt(r['mm'])}/Monat → {fmt(r['am'])}/Jahr</strong>
+        </div>""", unsafe_allow_html=True)
+
+    # Export + Restart
+    st.markdown("<hr>", unsafe_allow_html=True)
+    export = {
+        "timestamp": datetime.now().isoformat(),
+        "scenario": "Joey — Sales Training Business Case",
+        "ergebnisse": {
+            "gesamtinvestition": r["total"],
+            "zusatzgewinn_monat": r["mm"],
+            "jahresgewinn": r["am"],
+            "roi_prozent": round(r["roi"], 1),
+            "payback_monate": round(r["pb"], 1)
+        }
+    }
+    txt = f"""Joey's Business Case · Sales Training ROI
+{datetime.now().strftime('%d.%m.%Y')}
+
+Gesamtinvestition:  {fmt(r['total'])}
+Zusatzgewinn/Monat: {fmt(r['mm'])}
+Jahresgewinn:       {fmt(r['am'])}
+ROI:                {r['roi']:.0f}%
+Payback:            {r['pb']:.1f} Monate
+"""
+    c1, c2, c3, _ = st.columns([1, 1, 1, 3])
+    with c1:
+        st.download_button("⬇ JSON", json.dumps(export, indent=2, ensure_ascii=False),
+                           f"joey_{datetime.now().strftime('%Y%m%d')}.json", "application/json")
+    with c2:
+        st.download_button("⬇ Text", txt,
+                           f"joey_{datetime.now().strftime('%Y%m%d')}.txt", "text/plain")
+    with c3:
+        if st.button("Von vorne starten"):
+            for k in ["step","path","swifty_messages","params","results"]:
+                st.session_state.pop(k, None)
+            st.rerun()
+
+
+# ─── Main ─────────────────────────────────────────────────────────────────────
+def main():
+    st.markdown("""
+    <div style="display:flex; align-items:baseline; gap:0.9rem; margin-bottom:0.2rem;">
+        <div class="scene-header" style="margin:0; font-size:2rem;">HR loves Finance</div>
+        <div style="color:#B8BCDE; font-size:0.75rem; letter-spacing:0.1em;
+                    text-transform:uppercase; font-weight:600;">
+            Workshop Tool
+        </div>
+    </div>
+    <div style="color:#B0ABA0; font-size:0.8rem; margin-bottom:2.2rem;
+                display:flex; align-items:center; gap:0.5rem;">
+        <i class="fa-solid fa-building" style="font-size:0.7rem;"></i>
+        Anne Schuster Consulting &nbsp;·&nbsp;
+        <i class="fa-solid fa-globe" style="font-size:0.7rem;"></i>
+        anneschuster.com
     </div>
     """, unsafe_allow_html=True)
 
+    step = st.session_state.step
+    if   step == 1: step1()
+    elif step == 2: step2()
+    elif step == 3: step3()
+    elif step == 4: step4()
+    elif step == 5: step5()
+    elif step == 6: step6()
+
+    st.markdown("""
+    <div class="footer">
+        <i class="fa-solid fa-heart" style="color:#B8BCDE;"></i>
+        HR loves Finance &nbsp;·&nbsp; Anne Schuster Consulting &nbsp;·&nbsp; anneschuster.com
+    </div>""", unsafe_allow_html=True)
 
 if __name__ == "__main__":
     main()
