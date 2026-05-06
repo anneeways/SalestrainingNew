@@ -35,7 +35,20 @@ st.markdown("""
 /* Segoe UI — system font, no import needed */
 
 html, body, [class*="css"] { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; }
-.stApp { background-color: #F5F0E6; }
+.stApp { background-color: #E8E3D8; }
+
+/* ── Nav Bar ── */
+.nav-bar {
+    display: flex; gap: 0.5rem; flex-wrap: wrap;
+    background: #1E2A5E; border-radius: 10px;
+    padding: 0.6rem 1rem; margin-bottom: 1.5rem;
+    align-items: center;
+}
+.nav-bar span {
+    color: #B8BCDE; font-size: 0.72rem; font-weight: 600;
+    letter-spacing: 0.06em; text-transform: uppercase;
+    margin-right: 0.5rem;
+}
 
 /* ── Progress ── */
 .progress-label {
@@ -79,9 +92,9 @@ html, body, [class*="css"] { font-family: 'Segoe UI', system-ui, -apple-system, 
 /* ── Dialogue ── */
 .dialogue-box {
     background: white; border-radius: 12px;
-    border: 1px solid #EAE7DF;
+    border: 1.5px solid #C8C4BB;
     padding: 1.2rem 1.5rem; margin-bottom: 0.9rem;
-    box-shadow: 0 1px 4px rgba(30,42,94,0.05);
+    box-shadow: 0 2px 8px rgba(30,42,94,0.10);
 }
 .speaker-row {
     display: flex; align-items: center; gap: 0.5rem;
@@ -165,7 +178,7 @@ html, body, [class*="css"] { font-family: 'Segoe UI', system-ui, -apple-system, 
 /* ── Checklist ── */
 .check-item {
     background: white; border-radius: 10px;
-    border: 1px solid #EAE7DF;
+    border: 1.5px solid #C8C4BB;
     padding: 0.85rem 1.1rem; margin-bottom: 0.55rem;
     display: flex; gap: 0.75rem; align-items: flex-start;
 }
@@ -213,7 +226,7 @@ html, body, [class*="css"] { font-family: 'Segoe UI', system-ui, -apple-system, 
 /* ── Argument Items ── */
 .arg-item {
     background: white; border-radius: 10px;
-    border: 1px solid #EAE7DF;
+    border: 1.5px solid #C8C4BB;
     padding: 0.9rem 1.1rem; margin-bottom: 0.55rem;
     display: flex; gap: 0.75rem; align-items: flex-start;
 }
@@ -227,7 +240,7 @@ html, body, [class*="css"] { font-family: 'Segoe UI', system-ui, -apple-system, 
 /* ── Scenario Tile ── */
 .scenario-tile {
     background: white; border-radius: 10px;
-    border: 1px solid #EAE7DF;
+    border: 1.5px solid #C8C4BB;
     padding: 0.9rem 1.1rem; margin-bottom: 0.55rem;
 }
 .scenario-tile .s-badge {
@@ -411,6 +424,51 @@ def render_progress(current):
 
     st.markdown("<div style='margin-bottom:1.8rem;'></div>", unsafe_allow_html=True)
 
+# ─── Navigation Bar ───────────────────────────────────────────────────────────
+def render_nav():
+    """Quick-jump navigation bar"""
+    current = st.session_state.step
+
+    nav_items = [
+        (1, "fa-comments",   "Gespräch"),
+        (2, "fa-code-branch","Dein Weg"),
+        (3, "fa-compass",    "Vorbereitung"),
+        (4, "fa-handshake",  "Follow-up"),
+        (5, "fa-calculator", "Kalkulator"),
+        (6, "fa-chart-line", "Ergebnis"),
+    ]
+
+    cols = st.columns([1.2] + [1]*6)
+    with cols[0]:
+        st.markdown("""
+        <div style="height:32px; display:flex; align-items:center;">
+            <span style="font-size:0.65rem; color:#9CA3AF; font-weight:700;
+                         letter-spacing:0.07em; text-transform:uppercase;">
+                Springen zu:
+            </span>
+        </div>""", unsafe_allow_html=True)
+
+    for i, (step_num, icon, label) in enumerate(nav_items):
+        with cols[i + 1]:
+            is_current = step_num == current
+            bg = "#1E2A5E" if is_current else "#E8E3D8"
+            color = "#F5F0E6" if is_current else "#6B7280"
+            border = "1.5px solid #1E2A5E" if not is_current else "none"
+            st.markdown(f"""
+            <div style="background:{bg}; color:{color}; border:{border};
+                        border-radius:8px; padding:0.35rem 0.5rem;
+                        text-align:center; font-size:0.7rem; font-weight:600;
+                        display:flex; align-items:center; justify-content:center;
+                        gap:0.3rem; cursor:pointer; line-height:1.2;">
+                <i class="fa-solid {icon}"></i> {label}
+            </div>""", unsafe_allow_html=True)
+            if st.button("", key=f"nav_{step_num}", help=f"Zu: {label}"):
+                st.session_state.step = step_num
+                st.rerun()
+
+    st.markdown("<div style='margin-bottom:0.5rem;'></div>", unsafe_allow_html=True)
+
+
 
 # ─── Speaker Helper ───────────────────────────────────────────────────────────
 def dialogue(speaker, text, kind="joey"):
@@ -480,6 +538,7 @@ def make_charts(r):
 
 def step1():
     render_progress(1)
+    render_nav()
     st.markdown('<div class="scene-header">Das Gespräch</div>', unsafe_allow_html=True)
     st.markdown("""
     <div class="scene-sub">
@@ -530,6 +589,7 @@ def step1():
 
 def step2():
     render_progress(2)
+    render_nav()
     st.markdown('<div class="scene-header">Joeys nächster Schritt</div>', unsafe_allow_html=True)
 
     st.markdown(dialogue("Joey — innerlich",
@@ -587,6 +647,7 @@ def step2():
 
 def step3():
     render_progress(3)
+    render_nav()
 
     if st.session_state.path == "swifty":
         st.markdown('<div class="scene-header">Vorbereitung mit Swifty</div>', unsafe_allow_html=True)
@@ -673,6 +734,7 @@ def step3():
 
 def step4():
     render_progress(4)
+    render_nav()
     st.markdown('<div class="scene-header">Das Follow-up</div>', unsafe_allow_html=True)
     st.markdown("""
     <div class="scene-sub">
@@ -723,6 +785,7 @@ def step4():
 
 def step5():
     render_progress(5)
+    render_nav()
     st.markdown('<div class="scene-header">Der Kalkulator</div>', unsafe_allow_html=True)
     st.markdown("""
     <div class="scene-sub">
@@ -1064,6 +1127,7 @@ def generate_pdf(r, p):
 
 def step6():
     render_progress(6)
+    render_nav()
     r = st.session_state.results
     p = st.session_state.params
 
