@@ -24,12 +24,7 @@ st.set_page_config(
 )
 
 # ─── Font Awesome ─────────────────────────────────────────────────────────────
-# ─── Font Awesome — single lightweight CDN ───────────────────────────────────
-st.markdown("""
-<link rel="stylesheet"
-  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
-  crossorigin="anonymous"/>
-""", unsafe_allow_html=True)
+
 
 # ─── CSS ─────────────────────────────────────────────────────────────────────
 st.markdown("""
@@ -142,6 +137,29 @@ div[data-testid="stRadio"] p { color: #F5F0E6 !important; }
 /* ── Progress bar text ── */
 div[data-testid="stText"] p { color: #F5F0E6 !important; }
 
+
+/* ── NAV BUTTONS ── */
+div[data-testid="stHorizontalBlock"] button {
+    background: rgba(255,255,255,0.1) !important;
+    border: 1px solid rgba(184,188,222,0.35) !important;
+    border-radius: 6px !important;
+    color: #B8BCDE !important;
+    font-size: 0.78rem !important;
+    font-weight: 500 !important;
+    padding: 0.35rem 0.4rem !important;
+    box-shadow: none !important;
+}
+div[data-testid="stHorizontalBlock"] button[kind="primary"] {
+    background: #F5F0E6 !important;
+    color: #1E2A5E !important;
+    font-weight: 700 !important;
+    border: none !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2) !important;
+}
+div[data-testid="stHorizontalBlock"] button:hover {
+    background: rgba(255,255,255,0.2) !important;
+    color: #F5F0E6 !important;
+}
 /* ── Mobile ── */
 @media (max-width: 768px) {
     .progress-mobile-hide { display: none !important; }
@@ -535,13 +553,13 @@ def swifty_call(messages):
 
 # ─── Progress Bar ─────────────────────────────────────────────────────────────
 STEP_META = [
-    ("fa-comment-dots",       "Das Gespräch"),
-    ("fa-arrow-right-arrow-left",    "Dein Weg"),
-    ("fa-list-check",        "Vorbereitung"),
-    ("fa-people-arrows",      "Follow-up"),
-    ("fa-magnifying-glass-chart",    "Datensynthese"),
-    ("fa-calculator",     "Kalkulator"),
-    ("fa-award",     "Ergebnis"),
+    ("💬",       "Das Gespräch"),
+    ("↔",    "Dein Weg"),
+    ("✅",        "Vorbereitung"),
+    ("🤝",      "Follow-up"),
+    ("🔍",    "Datensynthese"),
+    ("🧮",     "Kalkulator"),
+    ("🏆",     "Ergebnis"),
 ]
 
 
@@ -581,7 +599,7 @@ def svg_icon(name, size=18, color="currentColor"):
       <path d="{path}"/>
     </svg>'''
 
-STEP_ICONS = ["fa-comment-dots","fa-arrow-right-arrow-left","fa-list-check","fa-people-arrows","fa-magnifying-glass-chart","fa-calculator","fa-award"]
+STEP_ICONS = ["💬","↔","✅","🤝","🔍","🧮","🏆"]
 
 
 
@@ -599,29 +617,7 @@ def render_nav():
     # CSS to style nav buttons
     st.markdown("""
     <style>
-    div[data-testid="stHorizontalBlock"] button[kind="secondary"] {
-        background: rgba(255,255,255,0.08) !important;
-        border: 1px solid rgba(184,188,222,0.3) !important;
-        border-radius: 6px !important;
-        color: #B8BCDE !important;
-        font-size: 0.78rem !important;
-        font-weight: 400 !important;
-        padding: 0.35rem 0.4rem !important;
-    }
-    div[data-testid="stHorizontalBlock"] button[kind="secondary"]:hover {
-        background: rgba(255,255,255,0.15) !important;
-        color: #F5F0E6 !important;
-    }
-    div[data-testid="stHorizontalBlock"] button[kind="primary"] {
-        background: #F5F0E6 !important;
-        border: none !important;
-        border-radius: 6px !important;
-        color: #1E2A5E !important;
-        font-size: 0.78rem !important;
-        font-weight: 700 !important;
-        padding: 0.35rem 0.4rem !important;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.2) !important;
-    }
+    
     </style>""", unsafe_allow_html=True)
 
     cols = st.columns(len(labels))
@@ -652,7 +648,7 @@ def dialogue(speaker, text, kind="joey"):
     <div class="dialogue-box">
         <div class="speaker-row">
             <div class="speaker-avatar {av}" style="font-size:0.75rem;">
-                <i class="fa-solid {fa}" style="color:{fg};"></i>
+                
             </div>
             <div class="speaker-name {sn}">{speaker}</div>
         </div>
@@ -861,15 +857,15 @@ def step3():
 
         # Part A: Can answer now
         items_now = [
-            ("fa-circle-question", "Ist Training wirklich die richtige Antwort?",
+            ("fa-check", "Ist Training wirklich die richtige Antwort?",
              "Haben wir Führungsprobleme? Unklare Prozesse? Fehlt Motivation — oder echtes Skill-Gap? Training löst nur das letzte."),
             ("fa-users-gear", "Führung & Teamdynamik",
              "Wie führt Thomas sein Team? Gibt es Fluktuation, Demotivation, fehlende Erwartungsklarheit?"),
-            ("fa-magnifying-glass-chart", "Was ist das eigentliche Problem?",
+            ("🔍", "Was ist das eigentliche Problem?",
              "Fähigkeitslücke, Prozess, Markt — oder alles zusammen? Eigene Einschätzung vor dem Gespräch."),
-            ("fa-award", "Marktdruck & Wettbewerb",
+            ("🏆", "Marktdruck & Wettbewerb",
              "Was macht die Konkurrenz anders? Hat der Wettbewerb bessere Abschlussquoten?"),
-            ("fa-circle-question", "Warum jetzt?",
+            ("fa-check", "Warum jetzt?",
              "Was verschärft die Dringlichkeit? Wettbewerbsdruck, Quartalsziele, Personalwechsel?"),
             ("fa-coins", "Gewinn statt Umsatz — meine Argumentation",
              "Nicht Mehrumsatz, sondern zusätzlicher Deckungsbeitrag ist das CFO-Argument."),
@@ -885,7 +881,7 @@ def step3():
              "Könnten wir mit 2-3 Top-Performern starten und ein Train-the-Trainer Konzept entwickeln?"),
             ("fa-comments", "CFO-Einwände antizipieren",
              "Welche Gegenargumente kommen? Antworten vorbereiten bevor das Meeting stattfindet."),
-            ("fa-circle-exclamation", "Was passiert wenn wir nichts tun?",
+            ("fa-check", "Was passiert wenn wir nichts tun?",
              "Entgangener Gewinn pro Monat — den konkreten Preis des Abwartens benennen."),
         ]
 
@@ -917,7 +913,7 @@ def step3():
                         f"<div style='display:flex;align-items:center;gap:0.6rem;margin-bottom:0.3rem;'>"
                         f"<div style='width:26px;height:26px;min-width:26px;border-radius:50%;"
                         f"background:#D1FAE5;display:flex;align-items:center;justify-content:center;'>"
-                        f"<i class='fa-solid {item_icon}' style='font-size:0.65rem;color:#059669;'></i>"
+                        f""
                         f"</div>"
                         f"<span style='font-size:0.9rem;font-weight:700;color:#1E2A5E;'>{title}</span>"
                         f"</div>"
@@ -1846,7 +1842,7 @@ def step7():
                     f"<div style='width:28px;height:28px;border-radius:50%;"
                     f"background:#EEF0F8;display:flex;align-items:center;"
                     f"justify-content:center;margin-top:3px;'>"
-                    f"<i class='fa-solid {arg_icon}' style='font-size:0.69rem;color:#1E2A5E;'></i>"
+                    f""
                     f"</div>",
                     unsafe_allow_html=True
                 )
@@ -1863,11 +1859,11 @@ def step7():
         cons_roi = ((cons_am - r["total"]) / r["total"]) * 100
 
         scenarios = [
-            ("fa-circle", "badge-cons", "KONSERVATIV", "20% Abschlussquote",
+            ("🔵", "badge-cons", "KONSERVATIV", "20% Abschlussquote",
              fmt(cons_am), f"{cons_roi:.0f}%"),
-            ("fa-circle", "badge-real", "REALISTISCH", f"{p.target_rate}% Abschlussquote",
+            ("🟢", "badge-real", "REALISTISCH", f"{p.target_rate}% Abschlussquote",
              fmt(r["am"]), f"{r['roi']:.0f}%"),
-            ("fa-circle", "badge-opt",  "OPTIMISTISCH", "+25% über Ziel",
+            ("🟡", "badge-opt",  "OPTIMISTISCH", "+25% über Ziel",
              fmt(r["am"] * 1.25), f"{((r['am']*1.25 - r['total'])/r['total']*100):.0f}%"),
         ]
         badge_colors = {"badge-cons": "#3B82F6", "badge-real": "#059669", "badge-opt": "#D97706"}
