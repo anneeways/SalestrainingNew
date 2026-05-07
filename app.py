@@ -635,21 +635,21 @@ def render_nav():
 # ─── Dialogue Helper ──────────────────────────────────────────────────────────
 def dialogue(speaker, text, kind="joey"):
     """kind: joey | vl | thought"""
-    fa_map  = {"joey": "fa-user", "vl": "fa-briefcase", "thought": "fa-ellipsis"}
-    av_cls  = {"joey": "av-joey", "vl": "av-vl",        "thought": "av-thought"}
-    sn_cls  = {"joey": "sn-joey", "vl": "sn-vl",        "thought": "sn-thought"}
-    fg_col  = {"joey": "#F5F0E6", "vl": "#6B7280",       "thought": "#9CA3AF"}
+    ICONS = {
+        "joey":    '<svg width="13" height="13" fill="none" stroke="#F5F0E6" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>',
+        "vl":      '<svg width="13" height="13" fill="none" stroke="#9CA3AF" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg>',
+        "thought": '<svg width="13" height="13" fill="#9CA3AF" viewBox="0 0 24 24"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>',
+    }
+    av_cls  = {"joey": "av-joey", "vl": "av-vl", "thought": "av-thought"}
+    sn_cls  = {"joey": "sn-joey", "vl": "sn-vl", "thought": "sn-thought"}
     txt_cls = "dialogue-thought" if kind == "thought" else "dialogue-text"
-    fa  = fa_map.get(kind, "fa-user")
-    av  = av_cls.get(kind, "av-joey")
-    sn  = sn_cls.get(kind, "sn-joey")
-    fg  = fg_col.get(kind, "#F5F0E6")
+    icon = ICONS.get(kind, ICONS["joey"])
+    av   = av_cls.get(kind, "av-joey")
+    sn   = sn_cls.get(kind, "sn-joey")
     return f"""
     <div class="dialogue-box">
         <div class="speaker-row">
-            <div class="speaker-avatar {av}" style="font-size:0.75rem;">
-                
-            </div>
+            <div class="speaker-avatar {av}">{icon}</div>
             <div class="speaker-name {sn}">{speaker}</div>
         </div>
         <div class="{txt_cls}">„{text}"</div>
