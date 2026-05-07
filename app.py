@@ -57,6 +57,91 @@ section[data-testid="stMain"] button:hover {
 html, body, [class*="css"] { font-family: 'Segoe UI', system-ui, sans-serif; color: #F5F0E6; }
 .stApp { background-color: #1E2A5E; color: #F5F0E6; }
 
+/* ── Info/Warning/Success boxes on dark bg ── */
+div[data-testid="stAlert"],
+div[data-testid="stAlert"] > div,
+div[data-testid="stAlert"] [data-testid="stMarkdownContainer"] {
+    background: rgba(255,255,255,0.15) !important;
+    border: 1px solid rgba(245,240,230,0.3) !important;
+    border-radius: 10px !important;
+    color: #F5F0E6 !important;
+}
+div[data-testid="stAlert"] p,
+div[data-testid="stAlert"] span,
+div[data-testid="stAlert"] a { 
+    color: #F5F0E6 !important; 
+    font-weight: 500 !important;
+}
+/* Override Streamlit's blue info color specifically */
+div[data-testid="stAlert"][kind="info"],
+div[data-baseweb="notification"] {
+    background: rgba(255,255,255,0.15) !important;
+    border-left: 3px solid #B8BCDE !important;
+}
+
+/* ── All markdown text on dark bg ── */
+.stMarkdown p, .stMarkdown li, .stMarkdown div { color: #F5F0E6; }
+
+/* ── Section headers in dark bg ── */
+div[data-testid="stVerticalBlock"] > div > div > div > p {
+    color: #F5F0E6 !important;
+}
+
+/* ── st.caption ── */
+.stCaptionContainer p, [data-testid="stCaptionContainer"] p {
+    color: #B8BCDE !important;
+}
+
+/* ── Expander ── */
+div[data-testid="stExpander"] {
+    background: rgba(255,255,255,0.08) !important;
+    border: 1px solid rgba(184,188,222,0.3) !important;
+    border-radius: 10px !important;
+}
+div[data-testid="stExpander"] summary { color: #F5F0E6 !important; }
+div[data-testid="stExpander"] p { color: #F5F0E6 !important; }
+
+/* ── Text inputs on dark bg ── */
+div[data-testid="stTextInput"] input,
+div[data-testid="stTextArea"] textarea {
+    background: rgba(255,255,255,0.1) !important;
+    color: #F5F0E6 !important;
+    border: 1px solid rgba(184,188,222,0.4) !important;
+    border-radius: 8px !important;
+}
+div[data-testid="stTextInput"] input::placeholder,
+div[data-testid="stTextArea"] textarea::placeholder {
+    color: #B8BCDE !important;
+}
+
+/* ── Number inputs ── */
+div[data-testid="stNumberInput"] input {
+    background: rgba(255,255,255,0.1) !important;
+    color: #F5F0E6 !important;
+    border: 1px solid rgba(184,188,222,0.4) !important;
+}
+
+/* ── Slider ── */
+div[data-testid="stSlider"] label { color: #F5F0E6 !important; }
+
+/* ── Radio ── */
+div[data-testid="stRadio"] label { color: #F5F0E6 !important; }
+div[data-testid="stRadio"] p { color: #F5F0E6 !important; }
+
+/* ── Dialogue boxes stay white ── */
+.dialogue-box { background: #ffffff !important; }
+.dialogue-text { color: #1E2A5E !important; }
+.dialogue-thought { color: #6B7280 !important; }
+.speaker-name { color: #1E2A5E !important; }
+
+/* ── Scenario / Checklist / Arg tiles — white on dark ── */
+.scenario-tile, .check-item, .arg-item {
+    background: rgba(255,255,255,0.95) !important;
+}
+
+/* ── Progress bar text ── */
+div[data-testid="stText"] p { color: #F5F0E6 !important; }
+
 /* ── Mobile ── */
 @media (max-width: 768px) {
     .progress-mobile-hide { display: none !important; }
@@ -1090,7 +1175,7 @@ def step5():
 
     # ── Status Quo Zusammenfassung (editierbar) ──────────────────────────────
     st.markdown(
-        "<div style='background:#1E2A5E;border-radius:10px;padding:0.7rem 1.1rem;"
+        "<div style='background:rgba(255,255,255,0.12);border:1px solid rgba(184,188,222,0.4);border-radius:10px;padding:0.7rem 1.1rem;"
         "margin-bottom:0.8rem;'><span style='color:#F5F0E6;font-weight:700;"
         "font-size:0.9rem;'>📊 Status Quo — Deine Zahlen eintragen</span>"
         "<span style='color:#B8BCDE;font-size:0.78rem;'> &nbsp;·&nbsp; anpassbar für euer Unternehmen</span></div>",
@@ -1147,7 +1232,7 @@ def step5():
 
     # ── Erkenntnisse aus Vorbereitung ─────────────────────────────────────────
     st.markdown(
-        "<div style='background:#1E2A5E;border-radius:10px;padding:0.7rem 1.1rem;"
+        "<div style='background:rgba(255,255,255,0.12);border:1px solid rgba(184,188,222,0.4);border-radius:10px;padding:0.7rem 1.1rem;"
         "margin:0.8rem 0;'><span style='color:#F5F0E6;font-weight:700;"
         "font-size:0.9rem;'>✏️ Deine Erkenntnisse aus der Vorbereitung</span></div>",
         unsafe_allow_html=True
@@ -1171,11 +1256,15 @@ def step5():
                 )
             st.markdown("<div style='height:3px'></div>", unsafe_allow_html=True)
     else:
-        st.info("💡 Keine Notizen aus Schritt 3 — fülle die Checkliste aus für eine vollständigere Analyse.")
+        st.markdown(
+        "<div style='background:rgba(255,255,255,0.15);border-left:3px solid #B8BCDE;"
+        "border-radius:8px;padding:0.8rem 1rem;color:#F5F0E6;font-size:0.88rem;'>"
+        "💡 Keine Notizen aus Schritt 3 — fülle die Checkliste aus für eine vollständigere Analyse."
+        "</div>", unsafe_allow_html=True)
 
     # ── Empfehlungs-Vorschlag (wählbar) ──────────────────────────────────────
     st.markdown(
-        "<div style='background:#1E2A5E;border-radius:10px;padding:0.7rem 1.1rem;"
+        "<div style='background:rgba(255,255,255,0.12);border:1px solid rgba(184,188,222,0.4);border-radius:10px;padding:0.7rem 1.1rem;"
         "margin:0.8rem 0;'><span style='color:#F5F0E6;font-weight:700;"
         "font-size:0.9rem;'>🎯 Empfehlungs-Richtung wählen</span>"
         "<span style='color:#B8BCDE;font-size:0.78rem;'>"
@@ -1233,7 +1322,7 @@ def step5():
 
     # ── AI Zusammenfassung ────────────────────────────────────────────────────
     st.markdown(
-        "<div style='background:#1E2A5E;border-radius:10px;padding:0.7rem 1.1rem;"
+        "<div style='background:rgba(255,255,255,0.12);border:1px solid rgba(184,188,222,0.4);border-radius:10px;padding:0.7rem 1.1rem;"
         "margin:1rem 0 0.6rem;'><span style='color:#F5F0E6;font-weight:700;"
         "font-size:0.9rem;'>🤖 Vorstandszusammenfassung generieren</span>"
         "<span style='color:#B8BCDE;font-size:0.78rem;'>"
@@ -1326,7 +1415,11 @@ def step6():
                 unsafe_allow_html=True
             )
     else:
-        st.info("💡 Tipp: Fülle die Checkliste in Schritt 3 aus — dann siehst du hier alle gesammelten Erkenntnisse.")
+        st.markdown(
+        "<div style='background:rgba(255,255,255,0.15);border-left:3px solid #B8BCDE;"
+        "border-radius:8px;padding:0.8rem 1rem;color:#F5F0E6;font-size:0.88rem;'>"
+        "💡 Tipp: Fülle die Checkliste in Schritt 3 aus — dann siehst du hier alle gesammelten Erkenntnisse."
+        "</div>", unsafe_allow_html=True)
 
     st.markdown("<hr>", unsafe_allow_html=True)
 
