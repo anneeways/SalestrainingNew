@@ -515,24 +515,27 @@ def render_nav():
     st.markdown("""
     <style>
     div[data-testid="stHorizontalBlock"] button[kind="secondary"] {
-        background: transparent !important;
-        border: none !important;
-        border-bottom: 2px solid transparent !important;
-        border-radius: 0 !important;
-        color: #9CA3AF !important;
+        background: rgba(255,255,255,0.08) !important;
+        border: 1px solid rgba(184,188,222,0.3) !important;
+        border-radius: 6px !important;
+        color: #B8BCDE !important;
         font-size: 0.78rem !important;
         font-weight: 400 !important;
-        padding: 0.3rem 0.2rem !important;
+        padding: 0.35rem 0.4rem !important;
+    }
+    div[data-testid="stHorizontalBlock"] button[kind="secondary"]:hover {
+        background: rgba(255,255,255,0.15) !important;
+        color: #F5F0E6 !important;
     }
     div[data-testid="stHorizontalBlock"] button[kind="primary"] {
-        background: transparent !important;
+        background: #F5F0E6 !important;
         border: none !important;
-        border-bottom: 3px solid #1E2A5E !important;
-        border-radius: 0 !important;
+        border-radius: 6px !important;
         color: #1E2A5E !important;
         font-size: 0.78rem !important;
         font-weight: 700 !important;
-        padding: 0.3rem 0.2rem !important;
+        padding: 0.35rem 0.4rem !important;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.2) !important;
     }
     </style>""", unsafe_allow_html=True)
 
