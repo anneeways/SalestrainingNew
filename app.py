@@ -42,8 +42,8 @@ section.main button,
 div[data-testid="stVerticalBlock"] button,
 div[data-testid="stHorizontalBlock"] button,
 .stButton > button {
-    background-color: #1E2A5E !important;
-    color: #ffffff !important;
+    background-color: #F5F0E6 !important;
+    color: #1E2A5E !important;
     border: none !important;
     border-radius: 8px !important;
     font-weight: 600 !important;
@@ -51,15 +51,14 @@ div[data-testid="stHorizontalBlock"] button,
 }
 section[data-testid="stMain"] button:hover { 
     opacity: 0.88 !important; 
-    background-color: #253472 !important; 
+    background-color: #E8E3D8 !important; 
 }
 
-html, body, [class*="css"] { font-family: 'Segoe UI', system-ui, sans-serif; }
-.stApp { background-color: #E8E3D8; }
+html, body, [class*="css"] { font-family: 'Segoe UI', system-ui, sans-serif; color: #F5F0E6; }
+.stApp { background-color: #1E2A5E; color: #F5F0E6; }
 
 /* ── Mobile ── */
 @media (max-width: 768px) {
-    /* Hide progress stepper dots on mobile — nav buttons are enough */
     .progress-mobile-hide { display: none !important; }
 
     /* Compact nav buttons */
@@ -81,15 +80,15 @@ html, body, [class*="css"] { font-family: 'Segoe UI', system-ui, sans-serif; }
 
 /* ── Content Boxes ── */
 .content-box {
-    background: white;
+    background: rgba(255,255,255,0.06);
     border-radius: 12px;
-    border: 1.5px solid #D1CCBF;
+    border: 1px solid rgba(184,188,222,0.4);
     padding: 1.6rem 1.8rem;
     margin-bottom: 1.2rem;
     box-shadow: 0 2px 6px rgba(30,42,94,0.06);
 }
 .navy-box {
-    background: #1E2A5E;
+    background: rgba(255,255,255,0.1);
     border-radius: 12px;
     padding: 1.4rem 1.8rem;
     margin-bottom: 1rem;
@@ -105,7 +104,7 @@ html, body, [class*="css"] { font-family: 'Segoe UI', system-ui, sans-serif; }
 
 /* ── Progress ── */
 .progress-label {
-    font-size: 0.72rem; color: #9CA3AF;
+    font-size: 0.72rem; color: #B8BCDE;
     letter-spacing: 0.07em; text-transform: uppercase;
     font-weight: 600; margin-bottom: 0.8rem;
 }
@@ -134,10 +133,10 @@ html, body, [class*="css"] { font-family: 'Segoe UI', system-ui, sans-serif; }
 /* ── Typography ── */
 .scene-header {
     font-family: 'Segoe UI', system-ui, sans-serif;
-    color: #1E2A5E; font-size: 1.9rem; margin-bottom: 0.25rem;
+    color: #F5F0E6; font-size: 1.9rem; margin-bottom: 0.25rem;
 }
 .scene-sub {
-    color: #9CA3AF; font-size: 0.82rem; letter-spacing: 0.06em;
+    color: #B8BCDE; font-size: 0.82rem; letter-spacing: 0.06em;
     text-transform: uppercase; margin-bottom: 1.6rem;
     display: flex; align-items: center; gap: 0.4rem;
 }
@@ -174,7 +173,7 @@ html, body, [class*="css"] { font-family: 'Segoe UI', system-ui, sans-serif; }
 /* ── Choice Cards ── */
 .choice-title {
     font-family: 'Segoe UI', system-ui, sans-serif;
-    color: #1E2A5E; font-size: 1.25rem; margin: 1.2rem 0 1.1rem;
+    color: #F5F0E6; font-size: 1.25rem; margin: 1.2rem 0 1.1rem;
 }
 .choice-card-navy {
     background: #1E2A5E; border-radius: 14px; padding: 1.7rem;
@@ -245,7 +244,7 @@ html, body, [class*="css"] { font-family: 'Segoe UI', system-ui, sans-serif; }
 /* ── KPI Cards ── */
 .kpi-grid { display: flex; gap: 0.9rem; margin: 1.3rem 0; flex-wrap: wrap; }
 .kpi-card {
-    background: #1E2A5E; border-radius: 12px;
+    background: rgba(255,255,255,0.12); border-radius: 12px;
     padding: 1.1rem 1.2rem; color: #F5F0E6;
     flex: 1; min-width: 120px;
 }
@@ -327,7 +326,7 @@ button[data-testid="baseButton-primary"] {
 .stButton > button:hover { opacity: 0.82 !important; }
 
 hr { border: none; border-top: 1px solid #EAE7DF; margin: 1.6rem 0; }
-label { color: #1E2A5E !important; font-weight: 500; }
+label { color: #F5F0E6 !important; font-weight: 500; }
 
 .footer {
     margin-top: 3rem; padding-top: 1rem;
