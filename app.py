@@ -806,8 +806,19 @@ def step3():
                 st.session_state.step = 4
                 st.rerun()
         else:
-            user_input = st.chat_input("Deine Antwort an Swifty …")
-            if user_input:
+            st.markdown("<div style='height:0.5rem'></div>", unsafe_allow_html=True)
+            col_input, col_send = st.columns([5, 1])
+            with col_input:
+                user_input = st.text_input(
+                    label="Antwort",
+                    placeholder="Deine Antwort an Swifty …",
+                    key=f"swifty_input_{len(st.session_state.swifty_messages)}",
+                    label_visibility="collapsed"
+                )
+            with col_send:
+                send = st.button("Senden →", key="swifty_send", use_container_width=True)
+
+            if send and user_input and user_input.strip():
                 st.session_state.swifty_messages.append({"role": "user", "content": user_input})
                 with st.spinner("Swifty denkt …"):
                     resp = swifty_call(st.session_state.swifty_messages)
