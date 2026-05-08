@@ -279,8 +279,8 @@ div[data-testid="stHorizontalBlock"] button:hover {
     color: #F5F0E6; font-size: 1.25rem; margin: 1.2rem 0 1.1rem;
 }
 .choice-card-navy {
-    background: #1E2A5E; border-radius: 14px; padding: 1.7rem;
-    color: #F5F0E6; margin-bottom: 0.8rem;
+    background: #DDEEFF; border-radius: 14px; padding: 1.7rem;
+    border: 1.5px solid #B8BCDE; margin-bottom: 0.8rem;
 }
 .choice-card-light {
     background: white; border: 1.5px solid #1E2A5E;
@@ -291,17 +291,17 @@ div[data-testid="stHorizontalBlock"] button:hover {
     display: flex; align-items: center; justify-content: center;
     font-size: 1.3rem; margin-bottom: 1rem;
 }
-.ci-navy  { background: rgba(184,188,222,0.25); color: #B8BCDE; }
+.ci-navy  { background: rgba(30,42,94,0.12); color: #1E2A5E; }
 .ci-light { background: #F5F0E6; color: #1E2A5E; }
 .choice-card-navy h3  {
     font-family: 'Segoe UI', system-ui, sans-serif; font-size: 1.15rem;
-    color: #F5F0E6; margin-bottom: 0.5rem;
+    color: #1E2A5E; margin-bottom: 0.5rem;
 }
 .choice-card-light h3 {
     font-family: 'Segoe UI', system-ui, sans-serif; font-size: 1.15rem;
     color: #1E2A5E; margin-bottom: 0.5rem;
 }
-.choice-card-navy p  { font-size: 0.87rem; color: #B8BCDE; line-height: 1.7; }
+.choice-card-navy p  { font-size: 0.87rem; color: #2A3A6E; line-height: 1.7; }
 .choice-card-light p { font-size: 0.87rem; color: #6B7280; line-height: 1.7; }
 
 /* ── Swifty Chat ── */
