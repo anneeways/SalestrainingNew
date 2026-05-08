@@ -604,6 +604,17 @@ STEP_ICONS = ["💬","↔","✅","🤝","🔍","🧮","🏆"]
 
 
 def render_progress(current):
+    # Scroll anchor at top
+    st.markdown('<div id="top"></div>', unsafe_allow_html=True)
+    components.html("""<script>
+        setTimeout(function(){
+            window.parent.document.getElementById('top') &&
+            window.parent.document.getElementById('top').scrollIntoView({behavior:'instant'});
+            var main = window.parent.document.querySelector('section[data-testid="stMain"]') ||
+                       window.parent.document.querySelector('.main');
+            if(main) main.scrollTop = 0;
+        }, 50);
+    </script>""", height=0)
     n = len(STEP_META)
     st.progress(current / n)
     st.markdown("<div style='height:4px'></div>", unsafe_allow_html=True)
